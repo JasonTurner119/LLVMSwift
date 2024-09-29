@@ -1,4 +1,6 @@
-#if SWIFT_PACKAGE
+/*
+ 
+ #if SWIFT_PACKAGE
 import cllvm
 #endif
 
@@ -275,3 +277,4 @@ public class FunctionPassManager {
 @available(*, deprecated, renamed: "Pass")
 public typealias FunctionPass = Pass
 
+*/

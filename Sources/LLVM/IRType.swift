@@ -79,9 +79,8 @@ internal func convertType(_ type: LLVMTypeRef) -> IRType {
     let count = Int(LLVMGetArrayLength(type))
     return ArrayType(elementType: elementType, count: count)
   case LLVMPointerTypeKind:
-    let pointee = convertType(LLVMGetElementType(type))
     let addressSpace = Int(LLVMGetPointerAddressSpace(type))
-    return PointerType(pointee: pointee, addressSpace: AddressSpace(addressSpace))
+    return PointerType(in: context, addressSpace: AddressSpace(addressSpace))
   case LLVMVectorTypeKind:
     let elementType = convertType(LLVMGetElementType(type))
     let count = Int(LLVMGetVectorSize(type))

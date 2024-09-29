@@ -1,3 +1,4 @@
+/*
 #if SWIFT_PACKAGE
 import cllvm
 import llvmshims
@@ -406,3 +407,4 @@ private class InternalizeCallbackContext {
     self.block = block
   }
 }
+*/

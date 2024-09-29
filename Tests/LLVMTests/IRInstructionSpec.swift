@@ -19,7 +19,7 @@ class IRInstructionSpec : XCTestCase {
                                type: FunctionType([
                                   IntType.int1,
                                   FloatType.float,
-                                  PointerType.toVoid,
+                                  PointerType(),
                                   structTy,
                                   VectorType(elementType: IntType.int32, count: 42),
                                ], VoidType()))
@@ -46,12 +46,11 @@ class IRInstructionSpec : XCTestCase {
     }
 
     for op in OpCode.Cast.allCases {
-      let opVal = builder.buildCast(op, value: fval, type: PointerType.toVoid) as! IRInstruction
+      let opVal = builder.buildCast(op, value: fval, type: PointerType()) as! IRInstruction
       XCTAssertTrue(opVal.isAInstruction)
       XCTAssertEqual(opVal.opCode, opVal.opCode)
     }
 
-    XCTAssertEqual((builder.buildPointerCast(of: pval, to: PointerType(pointee: IntType.int1)) as! IRInstruction).opCode, OpCode.bitCast)
     XCTAssertEqual((builder.buildIntCast(of: ival, to: IntType.int32, signed: false) as! IRInstruction).opCode, OpCode.zext)
     XCTAssertEqual((builder.buildIntCast(of: ival, to: IntType.int32, signed: true) as! IRInstruction).opCode, OpCode.sext)
     XCTAssertEqual((builder.buildNeg(ival) as! IRInstruction).opCode, OpCode.sub)
@@ -80,13 +79,13 @@ class IRInstructionSpec : XCTestCase {
     XCTAssertEqual(builder.buildBr(entry).opCode, OpCode.br)
     XCTAssertEqual(builder.buildIndirectBr(address: f.address(of: entry)!, destinations: []).opCode, OpCode.indirectBr)
     XCTAssertEqual(builder.buildUnreachable().opCode, OpCode.unreachable)
-    XCTAssertEqual(builder.buildCall(f, args: [ival, fval, pval]).opCode, OpCode.call)
-    XCTAssertEqual(builder.buildInvoke(f, args: [], next: entry, catch: landing).opCode, OpCode.invoke)
+    XCTAssertEqual(builder.buildCall(f, args: [ival, fval, pval], funcType: FunctionType([ival.type, fval.type, pval.type], VoidType())).opCode, OpCode.call)
+    XCTAssertEqual(builder.buildInvoke(f, args: [], next: entry, catch: landing, resultType: VoidType()).opCode, OpCode.invoke)
     XCTAssertEqual(builder.buildLandingPad(returning: VoidType(), clauses: [
       LandingPadClause.catch(global)
     ]).opCode, OpCode.landingPad)
     XCTAssertEqual((builder.buildResume(ival) as! IRInstruction).opCode, OpCode.resume)
-    XCTAssertEqual((builder.buildVAArg(pval, type: PointerType.toVoid) as! IRInstruction).opCode, OpCode.vaArg)
+    XCTAssertEqual((builder.buildVAArg(pval, type: PointerType()) as! IRInstruction).opCode, OpCode.vaArg)
     XCTAssertEqual(builder.buildAlloca(type: IntType.int1).opCode, OpCode.alloca)
     XCTAssertEqual(builder.buildStore(ival, to: pval).opCode, OpCode.store)
     XCTAssertEqual(builder.buildLoad(pval, type: IntType.int8).opCode, OpCode.load)
@@ -96,12 +95,12 @@ class IRInstructionSpec : XCTestCase {
     XCTAssertEqual((builder.buildTrunc(ival, type: IntType.int32) as! IRInstruction).opCode, OpCode.trunc)
     XCTAssertEqual((builder.buildSExt(ival, type: IntType.int32) as! IRInstruction).opCode, OpCode.sext)
     XCTAssertEqual((builder.buildZExt(ival, type: IntType.int32) as! IRInstruction).opCode, OpCode.zext)
-    XCTAssertEqual((builder.buildIntToPtr(ival, type: PointerType.toVoid) as! IRInstruction).opCode, OpCode.intToPtr)
+    XCTAssertEqual((builder.buildIntToPtr(ival, type: PointerType()) as! IRInstruction).opCode, OpCode.intToPtr)
     XCTAssertEqual((builder.buildPtrToInt(pval, type: IntType.int32) as! IRInstruction).opCode, OpCode.ptrToInt)
     XCTAssertEqual(builder.buildFence(ordering: .acquire).opCode, OpCode.fence)
     XCTAssertEqual((builder.buildAtomicCmpXchg(ptr: pval, of: ival, to: ival, successOrdering: .acquire, failureOrdering: .acquire) as! IRInstruction).opCode, OpCode.atomicCmpXchg)
     XCTAssertEqual((builder.buildAtomicRMW(atomicOp: .add, ptr: pval, value: ival, ordering: .acquire) as! IRInstruction).opCode, OpCode.atomicRMW)
-    XCTAssertEqual(builder.buildMalloc(IntType.int64).opCode, OpCode.bitCast) // malloc-bitcast pair
+    XCTAssertEqual(builder.buildMalloc(IntType.int64).opCode, OpCode.call)
     XCTAssertEqual(builder.buildFree(pval).opCode, OpCode.call)
     XCTAssertEqual(builder.buildMemset(to: pval, of: ival, length: 1, alignment: .one).opCode, OpCode.call)
     XCTAssertEqual(builder.buildMemCpy(to: pval, .one, from: pval, .one, length: 1).opCode, OpCode.call)

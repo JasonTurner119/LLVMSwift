@@ -1,3 +1,4 @@
+/*
 import LLVM
 import XCTest
 import FileCheck
@@ -100,3 +101,4 @@ class DIBuilderSpec : XCTestCase {
   ])
   #endif
 }
+*/

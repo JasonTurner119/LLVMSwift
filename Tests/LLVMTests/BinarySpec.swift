@@ -15,10 +15,7 @@ class BinarySpec : XCTestCase {
       }
       return objectFile
     case let .success(binary):
-      guard let objectFile = try? binary.objectFile(for: Triple.default.architecture) else {
-        fatalError("Missing object file for host architecture?")
-      }
-      return objectFile
+      return try! binary.objectFile(for: Triple.default.architecture)
     }
   }
 

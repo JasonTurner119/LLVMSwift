@@ -10,7 +10,7 @@
 #include "llvm/IR/LegacyPassManager.h"
 #include "llvm/Object/MachOUniversal.h"
 #include "llvm/Object/ObjectFile.h"
-#include "llvm/Support/ARMTargetParser.h"
+#include "llvm/TargetParser/ARMTargetParser.h"
 #include "llvm/Transforms/Utils.h"
 #include "llvm/Transforms/IPO.h"
 
@@ -40,14 +40,6 @@ extern "C" {
 
   // https://reviews.llvm.org/D66237
   void LLVMAddGlobalsAAWrapperPass(LLVMPassManagerRef PM);
-
-  // https://reviews.llvm.org/D66061
-  typedef enum {
-    LLVMTailCallKindNone,
-    LLVMTailCallKindTail,
-    LLVMTailCallKindMustTail,
-    LLVMTailCallKindNoTail
-  } LLVMTailCallKind;
 
   LLVMTailCallKind LLVMGetTailCallKind(LLVMValueRef CallInst);
   void LLVMSetTailCallKind(LLVMValueRef CallInst, LLVMTailCallKind TCK);

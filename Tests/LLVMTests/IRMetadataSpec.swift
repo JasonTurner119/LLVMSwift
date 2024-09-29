@@ -173,14 +173,14 @@ class IRMetadataSpec : XCTestCase {
       // struct B *val = alloca(sizeof(struct B));
       // IRSIMPLETBAA-NEXT:  %0 = alloca { i32, { i16 } }
       let alloca = builder.buildAlloca(type: structTyB)
-      // IRSIMPLETBAA-NEXT:  %1 = getelementptr inbounds { i32, { i16 } }, { i32, { i16 } }* %0, i64 0, i32 1, i32 0
+      // IRSIMPLETBAA-NEXT:  %1 = getelementptr inbounds { i32, { i16 } }, ptr %0, i64 0, i32 1, i32 0
       let field = builder.buildInBoundsGEP(alloca, type: structTyB, indices: [
         IntType.int64.constant(0), // (*this)
         IntType.int32.constant(1), // .a
         IntType.int32.constant(0), // .s
       ])
       // B->a.s = 42
-      // IRSIMPLETBAA-NEXT:  store i16 42, i16* %1, align 2, !tbaa [[AccessTag:![0-9]+]]
+      // IRSIMPLETBAA-NEXT:  store i16 42, ptr %1, align 2, !tbaa [[AccessTag:![0-9]+]]
       let si = builder.buildStore(IntType.int16.constant(42), to: field)
       // IRSIMPLETBAA-NEXT:  ret void
       builder.buildRetVoid()
@@ -226,8 +226,8 @@ class IRMetadataSpec : XCTestCase {
       let builder = IRBuilder(module: module)
       let MDB = MDBuilder()
 
-      // IRMEMTRANSFERTBAA: define void @main(i8* %0) {
-      let F = module.addFunction("main", type: FunctionType([PointerType.toVoid], VoidType()))
+      // IRMEMTRANSFERTBAA: define void @main(ptr %0) {
+      let F = module.addFunction("main", type: FunctionType([PointerType()], VoidType()))
       // IRMEMTRANSFERTBAA-NEXT: entry:
       let bb = F.appendBasicBlock(named: "entry")
       builder.positionAtEnd(of: bb)
@@ -250,13 +250,12 @@ class IRMetadataSpec : XCTestCase {
       ], isPacked: true)
 
       // struct B *val = alloca(sizeof(struct B));
-      // IRMEMTRANSFERTBAA-NEXT:  %1 = alloca <{ i1, i15, <{ i16 }> }>
+      // IRMEMTRANSFERTBAA-NEXT:  %1 = alloca <{ i1, i15, <{ i16 }> }>, align 8
       let alloca = builder.buildAlloca(type: structTyB)
-      // IRMEMTRANSFERTBAA-NEXT:  %2 = bitcast <{ i1, i15, <{ i16 }> }>* %1 to i8*
-      let src = builder.buildPointerCast(of: alloca, to: PointerType(pointee: structTyB))
-      // IRMEMTRANSFERTBAA-NEXT: call void @llvm.memcpy.p0i8.p0i8.i32(i8* align 1 %0, i8* align 1 %2, i32 5, i1 false), !tbaa.struct [[StructAccssTag:![0-9]+]]
+      
+      // IRMEMTRANSFERTBAA-NEXT: call void @llvm.memcpy.p0.p0.i32(ptr align 1 %0, ptr align 1 %1, i32 5, i1 false), !tbaa.struct [[StructAccssTag:![0-9]+]]
       let inst = builder.buildMemCpy(to: F.parameters[0], module.dataLayout.abiAlignment(of: structTyB),
-                                     from: src, module.dataLayout.abiAlignment(of: structTyB),
+                                     from: alloca, module.dataLayout.abiAlignment(of: structTyB),
                                      length: IntType.int32.constant(module.dataLayout.abiSize(of: structTyB).rawValue))
 
       // IRMEMTRANSFERTBAA-NEXT:  ret void

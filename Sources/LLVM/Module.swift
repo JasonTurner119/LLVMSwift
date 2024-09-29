@@ -583,10 +583,11 @@ extension Module {
   /// - parameter name: The name of the newly inserted alias.
   /// - parameter aliasee: The value or constant to alias.
   /// - parameter type: The type of the aliased value or expression.
+  /// - parameter addressSpace: The address space where the aliased value resides.
   ///
   /// - returns: A value representing the newly created alias.
-  public func addAlias(name: String, to aliasee: IRGlobal, type: IRType) -> Alias {
-    return Alias(llvm: LLVMAddAlias(llvm, type.asLLVM(), aliasee.asLLVM(), name))
+  public func addAlias(name: String, to aliasee: IRGlobal, type: IRType, addressSpace: AddressSpace = .zero) -> Alias {
+    return Alias(llvm: LLVMAddAlias2(llvm, type.asLLVM(), UInt32(addressSpace.rawValue), aliasee.asLLVM(), name))
   }
 
   /// Append to the module-scope inline assembly blocks.

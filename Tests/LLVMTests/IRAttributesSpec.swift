@@ -53,12 +53,12 @@ class IRAttributesSpec : XCTestCase {
       // ARGATTR-NEXT: source_filename = "[[ModuleName]]"
       let module = Module(name: "IRBuilderTest")
       let builder = IRBuilder(module: module)
-      let i8ptr = PointerType(pointee: IntType.int8)
+      let i8ptr = PointerType()
       let fn = builder.addFunction("fn",
                                    type: FunctionType([IntType.int32, i8ptr],
                                                       IntType.int32))
 
-      // ARGATTR: define i32 @fn(i32 zeroext %0, i8* align 8 %1) {
+      // ARGATTR: define i32 @fn(i32 zeroext %0, ptr align 8 %1) {
       fn.addAttribute(.zeroext, to: .argument(0))
       fn.addAttribute(.align, value: 8, to: .argument(1))
 
@@ -76,7 +76,7 @@ class IRAttributesSpec : XCTestCase {
     let module = Module(name: "FNATTR")
     let builder = IRBuilder(module: module)
 
-    let i8ptr = PointerType(pointee: IntType.int8)
+    let i8ptr = PointerType()
     let fn = builder.addFunction("fn",
                                  type: FunctionType([i8ptr], i8ptr))
 
@@ -161,7 +161,7 @@ class IRAttributesSpec : XCTestCase {
     let module = Module(name: "ARGATTR")
     let builder = IRBuilder(module: module)
 
-    let i8ptr = PointerType(pointee: IntType.int8)
+    let i8ptr = PointerType()
     let fn = builder.addFunction("fn",
                                  type: FunctionType([i8ptr], i8ptr))
 

@@ -13,14 +13,14 @@ class IRGlobalSpec : XCTestCase {
       // IRINERTGLOBAL: @external_global = external constant i32
       let extGlobal = builder.addGlobal("external_global", type: IntType.int32)
       extGlobal.isGlobalConstant = true
-      // IRINERTGLOBAL: @got.external_global = private unnamed_addr constant i32* @external_global
+      // IRINERTGLOBAL: @got.external_global = private unnamed_addr constant ptr @external_global
       var gotGlobal = builder.addGlobal("got.external_global",
                                         initializer: extGlobal)
       gotGlobal.linkage = .`private`
       gotGlobal.unnamedAddressKind = .global
       gotGlobal.isGlobalConstant = true
 
-      // IRINERTGLOBAL: @external_relative_reference = global i32 trunc (i64 sub (i64 ptrtoint (i32** @got.external_global to i64), i64 ptrtoint (i32* @external_relative_reference to i64)) to i32)
+      // IRINERTGLOBAL: @external_relative_reference = global i32 trunc (i64 sub (i64 ptrtoint (ptr @got.external_global to i64), i64 ptrtoint (ptr @external_relative_reference to i64)) to i32)
       let ext_relative_reference = builder.addGlobal("external_relative_reference", type: IntType.int32)
       ext_relative_reference.initializer = Constant<Unsigned>.pointerToInt(gotGlobal, .int64)
         .subtracting(Constant<Unsigned>.pointerToInt(ext_relative_reference, .int64)).truncate(to: .int32)
@@ -43,7 +43,7 @@ class IRGlobalSpec : XCTestCase {
       let comdatLargestSec = module.comdat(named: "test_largest")
       comdatLargestSec.selectionKind = .largest
 
-      // IRCOMDATGLOBAL: $test_no_dupes = comdat noduplicates
+      // IRCOMDATGLOBAL: $test_no_dupes = comdat nodeduplicate
       let comdatNoDupesSec = module.comdat(named: "test_no_dupes")
       comdatNoDupesSec.selectionKind = .noDuplicates
 

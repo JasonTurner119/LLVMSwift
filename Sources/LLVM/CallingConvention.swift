@@ -60,10 +60,6 @@ public enum CallingConvention {
   ///
   /// At the moment only X86 supports this convention (both 32 and 64 bit).
   case hiPE
-  /// This calling convention has been implemented for WebKit FTL JIT. It passes
-  /// arguments on the stack right to left (as cdecl does), and returns a value
-  /// in the platform's customary return register.
-  case webKitJS
   /// Calling convention for dynamic register based calls
   /// (e.g. stackmap and patchpoint intrinsics).
   ///
@@ -348,7 +344,6 @@ public enum CallingConvention {
     case LLVMColdCallConv: self = .cold
     case LLVMGHCCallConv: self = .ghc
     case LLVMHiPECallConv: self = .hiPE
-    case LLVMWebKitJSCallConv: self = .webKitJS
     case LLVMAnyRegCallConv: self = .anyReg
     case LLVMPreserveMostCallConv: self = .preserveMost
     case LLVMPreserveAllCallConv: self = .preserveAll
@@ -392,7 +387,7 @@ public enum CallingConvention {
   private static let conventionMapping: [CallingConvention: LLVMCallConv] = [
     .c : LLVMCCallConv, .fast : LLVMFastCallConv, .cold : LLVMColdCallConv,
     .ghc : LLVMGHCCallConv, .hiPE : LLVMHiPECallConv,
-    .webKitJS : LLVMWebKitJSCallConv, .anyReg : LLVMAnyRegCallConv,
+    .anyReg : LLVMAnyRegCallConv,
     .preserveMost : LLVMPreserveMostCallConv,
     .preserveAll : LLVMPreserveAllCallConv, .swift : LLVMSwiftCallConv,
     .cxxFastThreadLocalStorage : LLVMCXXFASTTLSCallConv,

@@ -897,20 +897,69 @@ extension IRBuilder {
   ///
   /// - parameter fn: The function to invoke.
   /// - parameter args: A list of arguments.
+  /// - parameter funcType: The type of the function to be called.
   /// - parameter name: The name for the newly inserted instruction.
   ///
   /// - returns: A value representing the result of returning from the callee.
-  public func buildCall(_ fn: IRValue, args: [IRValue], name: String = "") -> Call {
+  public func buildCall(_ fn: IRValue, args: [IRValue], funcType: IRType, name: String = "") -> Call {
     var args = args.map { $0.asLLVM() as Optional }
     return args.withUnsafeMutableBufferPointer { buf in
-      return Call(llvm: LLVMBuildCall(llvm, fn.asLLVM(), buf.baseAddress!, UInt32(buf.count), name))
+      return Call(llvm: LLVMBuildCall2(llvm, funcType.asLLVM(), fn.asLLVM(), buf.baseAddress!, UInt32(buf.count), name))
     }
+  }
+  
+  /// Build a call to the given function with the given arguments to transfer
+  /// control to that function.
+  ///
+  /// - parameter fn: The function to invoke.
+  /// - parameter args: A list of arguments.
+  /// - parameter resultType: The result type of the called function.
+  /// - parameter name: The name for the newly inserted instruction.
+  ///
+  /// - returns: A value representing the result of returning from the callee.
+  public func buildCall(_ fn: IRValue, args: [IRValue], resultType: IRType, name: String = "") -> Call {
+    let funcType = FunctionType(args.map(\.type), resultType)
+    return buildCall(fn, args: args, funcType: funcType, name: name)
   }
 }
 
 // MARK: Exception Handling Instructions
 
 extension IRBuilder {
+  
+  /// Build a call to the given function with the given arguments with the
+  /// possibility of control transfering to either the `next` basic block or
+  /// the `catch` basic block if an exception occurs.
+  ///
+  /// If the callee function returns with the `ret` instruction, control flow
+  /// will return to the `next` label. If the callee (or any indirect callees)
+  /// returns via the `resume` instruction or other exception handling
+  /// mechanism, control is interrupted and continued at the dynamically nearest
+  /// `exception` label.
+  ///
+  /// The `catch` block is a landing pad for the exception. As such, the first
+  /// instruction of that block is required to be the `landingpad` instruction,
+  /// which contains the information about the behavior of the program after
+  /// unwinding happens.
+  ///
+  /// - parameter fn: The function to invoke.
+  /// - parameter args: A list of arguments.
+  /// - parameter next: The destination block if the invoke succeeds without exceptions.
+  /// - parameter catch: The destination block if the invoke encounters an exception.
+  /// - parameter funcType: The type of the function to be called.
+  /// - parameter name: The name for the newly inserted instruction.
+  ///
+  /// - returns: A value representing the result of returning from the callee
+  ///   under normal circumstances.  Under exceptional circumstances, the value
+  ///   represents the value of any `resume` instruction in the `catch` block.
+  public func buildInvoke(_ fn: IRValue, args: [IRValue], next: BasicBlock, catch: BasicBlock, funcType: IRType, name: String = "") -> Invoke {
+    precondition(`catch`.firstInstruction!.opCode == .landingPad, "First instruction of catch block must be a landing pad")
+    var args = args.map { $0.asLLVM() as Optional }
+    return args.withUnsafeMutableBufferPointer { buf in
+      return Invoke(llvm: LLVMBuildInvoke2(llvm, funcType.asLLVM(), fn.asLLVM(), buf.baseAddress!, UInt32(buf.count), next.llvm, `catch`.llvm, name))
+    }
+  }
+  
   /// Build a call to the given function with the given arguments with the
   /// possibility of control transfering to either the `next` basic block or
   /// the `catch` basic block if an exception occurs.
@@ -930,18 +979,15 @@ extension IRBuilder {
   /// - parameter args: A list of arguments.
   /// - parameter next: The destination block if the invoke succeeds without exceptions.
   /// - parameter catch: The destination block if the invoke encounters an exception.
+  /// - parameter resultType: The result type of the function.
   /// - parameter name: The name for the newly inserted instruction.
   ///
   /// - returns: A value representing the result of returning from the callee
   ///   under normal circumstances.  Under exceptional circumstances, the value
   ///   represents the value of any `resume` instruction in the `catch` block.
-  public func buildInvoke(_ fn: IRValue, args: [IRValue], next: BasicBlock, catch: BasicBlock, name: String = "") -> Invoke {
-    precondition(`catch`.firstInstruction!.opCode == .landingPad, "First instruction of catch block must be a landing pad")
-
-    var args = args.map { $0.asLLVM() as Optional }
-    return args.withUnsafeMutableBufferPointer { buf in
-      return Invoke(llvm: LLVMBuildInvoke(llvm, fn.asLLVM(), buf.baseAddress!, UInt32(buf.count), next.llvm, `catch`.llvm, name))
-    }
+  public func buildInvoke(_ fn: IRValue, args: [IRValue], next: BasicBlock, catch: BasicBlock, resultType: IRType, name: String = "") -> Invoke {
+    let funcType = FunctionType(args.map(\.type), resultType)
+    return buildInvoke(fn, args: args, next: next, catch: `catch`, funcType: funcType, name: name)
   }
 
   /// Build a landing pad to specify that a basic block is where an exception 
@@ -1423,18 +1469,19 @@ extension IRBuilder {
   /// pointers must be appropriately aligned for their element types and 
   /// pointing into the same object.
   ///
+  /// - parameter pointeeType: The type pointed to by the pointers.
   /// - parameter lhs: The first pointer (the minuend).
   /// - parameter rhs: The second pointer (the subtrahend).
   /// - parameter name: The name for the newly inserted instruction.
   ///
   /// - returns: A IRValue representing a 64-bit integer value of the difference
   ///   of the two pointer values modulo the size of the pointed-to objects.
-  public func buildPointerDifference(_ lhs: IRValue, _ rhs: IRValue, name: String = "") -> IRValue {
+  public func buildPointerDifference(pointeeType: IRType, _ lhs: IRValue, _ rhs: IRValue, name: String = "") -> IRValue {
     precondition(
       lhs.type is PointerType && rhs.type is PointerType,
       "Cannot take pointer diff of \(lhs.type) and \(rhs.type)."
     )
-    return LLVMBuildPtrDiff(llvm, lhs.asLLVM(), rhs.asLLVM(), name)
+    return LLVMBuildPtrDiff2(llvm, pointeeType.asLLVM(), lhs.asLLVM(), rhs.asLLVM(), name)
   }
 }
 
@@ -1910,13 +1957,14 @@ extension IRBuilder {
   ///   side effects.  Defaults to `false`.
   /// - parameter needsAlignedStack: Whether the function containing the
   ///   asm needs to align its stack conservatively.  Defaults to `true`.
+  /// - parameter canThrow: Whether this inline asm expression can throw. Defaults to `false`.
   ///
   /// - returns: A representation of the newly created inline assembly
   ///   expression.
   public func buildInlineAssembly(
     _ asm: String, dialect: InlineAssemblyDialect, type: FunctionType,
     constraints: String = "",
-    hasSideEffects: Bool = true, needsAlignedStack: Bool = true
+    hasSideEffects: Bool = true, needsAlignedStack: Bool = true, canThrow: Bool = false
   ) -> IRValue {
     var asm = asm.utf8CString
     var constraints = constraints.utf8CString
@@ -1926,100 +1974,11 @@ extension IRBuilder {
                                 asm.baseAddress, asm.count,
                                 constraints.baseAddress, constraints.count,
                                 hasSideEffects.llvm, needsAlignedStack.llvm,
-                                dialect.llvm)
+                                dialect.llvm, canThrow.llvm)
       }
     }
   }
 }
-
-// MARK: Deprecated APIs
-
-extension IRBuilder {
-  /// Build a load instruction that loads a value from the location in the
-  /// given value.
-  ///
-  /// If alignment is not specified, or if zero, the target will choose a default
-  /// value that is convenient and compatible with the type.
-  ///
-  /// - parameter ptr: The pointer value to load from.
-  /// - parameter ordering: The ordering effect of the fence for this load,
-  ///   if any.  Defaults to a nonatomic load.
-  /// - parameter volatile: Whether this is a load from a volatile memory location.
-  /// - parameter alignment: The alignment of the access.
-  /// - parameter name: The name for the newly inserted instruction.
-  ///
-  /// - returns: A value representing the result of a load from the given
-  ///   pointer value.
-  @available(*, deprecated, message: "Use buildLoad(_:type:ordering:volatile:alignment:name) instead")
-  public func buildLoad(_ ptr: IRValue, ordering: AtomicOrdering = .notAtomic, volatile: Bool = false, alignment: Alignment = .zero, name: String = "") -> IRInstruction {
-    let loadInst = LLVMBuildLoad(llvm, ptr.asLLVM(), name)!
-    LLVMSetOrdering(loadInst, ordering.llvm)
-    LLVMSetVolatile(loadInst, volatile.llvm)
-    if !alignment.isZero {
-      LLVMSetAlignment(loadInst, alignment.rawValue)
-    }
-    return loadInst
-  }
-
-  /// Build a GEP (Get Element Pointer) instruction suitable for indexing into
-  /// a struct.
-  ///
-  /// - parameter ptr: The base address for the index calculation.
-  /// - parameter index: The offset from the base for the index calculation.
-  /// - parameter name: The name for the newly inserted instruction.
-  ///
-  /// - returns: A value representing the address of a subelement of the given
-  ///   struct value.
-  @available(*, deprecated, message: "Use buildStructGEP(_:type:index:name) instead")
-  public func buildStructGEP(_ ptr: IRValue, index: Int, name: String = "") -> IRValue {
-    return LLVMBuildStructGEP(llvm, ptr.asLLVM(), UInt32(index), name)
-  }
-
-  /// Build a GEP (Get Element Pointer) instruction.
-  ///
-  /// The `GEP` instruction is often the source of confusion.  LLVM [provides a
-  /// document](http://llvm.org/docs/GetElementPtr.html) to answer questions
-  /// around its semantics and correct usage.
-  ///
-  /// - parameter ptr: The base address for the index calculation.
-  /// - parameter indices: A list of indices that indicate which of the elements
-  ///   of the aggregate object are indexed.
-  /// - parameter name: The name for the newly inserted instruction.
-  ///
-  /// - returns: A value representing the address of a subelement of the given
-  ///   aggregate data structure value.
-  @available(*, deprecated, message: "Use buildGEP(_:type:indices:name) instead")
-  public func buildGEP(_ ptr: IRValue, indices: [IRValue], name: String = "") -> IRValue {
-    var vals = indices.map { $0.asLLVM() as Optional }
-    return vals.withUnsafeMutableBufferPointer { buf in
-      return LLVMBuildGEP(llvm, ptr.asLLVM(), buf.baseAddress, UInt32(buf.count), name)
-    }
-  }
-
-  /// Build a `GEP` (Get Element Pointer) instruction with a resultant value
-  /// that is undefined if the address is outside the actual underlying
-  /// allocated object and not the address one-past-the-end.
-  ///
-  /// The `GEP` instruction is often the source of confusion.  LLVM [provides a
-  /// document](http://llvm.org/docs/GetElementPtr.html) to answer questions
-  /// around its semantics and correct usage.
-  ///
-  /// - parameter ptr: The base address for the index calculation.
-  /// - parameter indices: A list of indices that indicate which of the elements
-  ///   of the aggregate object are indexed.
-  /// - parameter name: The name for the newly inserted instruction.
-  ///
-  /// - returns: A value representing the address of a subelement of the given
-  ///   aggregate data structure value.
-  @available(*, deprecated, message: "Use buildInBoundsGEP(_:type:indices:name) instead")
-  public func buildInBoundsGEP(_ ptr: IRValue, indices: [IRValue], name: String = "") -> IRValue {
-    var vals = indices.map { $0.asLLVM() as Optional }
-    return vals.withUnsafeMutableBufferPointer { buf in
-      return LLVMBuildInBoundsGEP(llvm, ptr.asLLVM(), buf.baseAddress, UInt32(buf.count), name)
-    }
-  }
-}
-
 
 private func lowerVector(_ type: IRType) -> IRType {
     guard let vectorType = type as? VectorType else {

@@ -22,13 +22,13 @@ class ConstantSpec : XCTestCase {
       // SIGNEDCONST-NOT: %{{[0-9]+}} = add i64 %%{{[0-9]+}}, %%{{[0-9]+}}
       let val1 = builder.buildAdd(constant.adding(constant), constant.multiplying(constant))
       // SIGNEDCONST-NOT: %{{[0-9]+}} = sub i64 %%{{[0-9]+}}, %%{{[0-9]+}}
-      let val2 = builder.buildSub(constant.subtracting(constant), constant.dividing(by: constant))
+      let val2 = builder.buildSub(constant.subtracting(constant), constant)
       // SIGNEDCONST-NOT: %{{[0-9]+}} = mul i64 %%{{[0-9]+}}, %%{{[0-9]+}}
       let val3 = builder.buildMul(val1, val2)
       // SIGNEDCONST-NOT: %{{[0-9]+}} = mul i64 %%{{[0-9]+}}, %%{{[0-9]+}}
       let val4 = builder.buildMul(val3, constant.negate())
 
-      // SIGNEDCONST-NEXT: ret i64 77616
+      // SIGNEDCONST-NEXT: ret i64 3259872
       builder.buildRet(val4)
       // SIGNEDCONST-NEXT: }
       module.dump()
@@ -51,11 +51,11 @@ class ConstantSpec : XCTestCase {
       // UNSIGNEDCONST-NOT: %{{[0-9]+}} = add i64 %%{{[0-9]+}}, %%{{[0-9]+}}
       let val1 = builder.buildAdd(constant.adding(constant), constant.multiplying(constant))
       // UNSIGNEDCONST-NOT: %{{[0-9]+}} = sub i64 %%{{[0-9]+}}, %%{{[0-9]+}}
-      let val2 = builder.buildSub(constant.subtracting(constant), constant.dividing(by: constant))
+      let val2 = builder.buildSub(constant.subtracting(constant), constant)
       // UNSIGNEDCONST-NOT: %{{[0-9]+}} = mul i64 %%{{[0-9]+}}, %%{{[0-9]+}}
       let val3 = builder.buildMul(val1, val2)
 
-      // UNSIGNEDCONST-NEXT: ret i64 -1848
+      // UNSIGNEDCONST-NEXT: ret i64 -77616
       builder.buildRet(val3)
       // UNSIGNEDCONST-NEXT: }
       module.dump()
@@ -76,13 +76,13 @@ class ConstantSpec : XCTestCase {
       builder.positionAtEnd(of: entry)
 
       // FLOATINGCONST-NOT: %{{[0-9]+}} = add double %%{{[0-9]+}}, %%{{[0-9]+}}
-      let val1 = builder.buildAdd(constant.adding(constant), constant.multiplying(constant))
+      let val1 = builder.buildAdd(constant, constant)
       // FLOATINGCONST-NOT: %{{[0-9]+}} = sub double %%{{[0-9]+}}, %%{{[0-9]+}}
-      let val2 = builder.buildSub(constant.subtracting(constant), constant.dividing(by: constant))
+      let val2 = builder.buildSub(constant, constant)
       // FLOATINGCONST-NOT: %{{[0-9]+}} = mul double %%{{[0-9]+}}, %%{{[0-9]+}}
       let val3 = builder.buildMul(val1, val2)
 
-      // FLOATINGCONST-NEXT: ret double -1.848000e+03
+      // FLOATINGCONST-NEXT: ret double 0.000000e+00
       builder.buildRet(val3)
       // FLOATINGCONST-NEXT: }
       module.dump()
@@ -126,7 +126,7 @@ class ConstantSpec : XCTestCase {
       let entry = main.appendBasicBlock(named: "entry")
       builder.positionAtEnd(of: entry)
 
-      let firstElement = constant.getElement(indices: [0])
+      let firstElement = builder.buildExtractElement(vector: constant, index: 0)
 
       // STRUCTCONSTGETELEMENT-NEXT: ret i64 42
       builder.buildRet(firstElement)

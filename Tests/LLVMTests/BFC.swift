@@ -160,7 +160,7 @@ private enum Externs {
                                                                  cellType))
       let entry = f.appendBasicBlock(named: "entry")
       builder.positionAtEnd(of: entry)
-      let charValue = builder.buildCall(getCharExtern, args: [])
+      let charValue = builder.buildCall(getCharExtern, args: [], funcType: FunctionType([], cellType))
       let cond = builder.buildICmp(charValue, cellType.constant(0), .signedGreaterThanOrEqual)
       let retVal = builder.buildSelect(cond, then: charValue, else: cellType.constant(0))
       builder.buildRet(retVal)
@@ -175,11 +175,11 @@ private enum Externs {
                                   type: FunctionType([], VoidType()))
       let entry = f.appendBasicBlock(named: "entry")
       builder.positionAtEnd(of: entry)
-      let ptrTy = PointerType(pointee: IntType.int8)
+      let ptrTy = PointerType()
       let fflushExtern = builder.addFunction("fflush",
                                              type: FunctionType([ ptrTy ],
                                                                 IntType.int32))
-      _ = builder.buildCall(fflushExtern, args: [ ptrTy.constPointerNull() ])
+      _ = builder.buildCall(fflushExtern, args: [ ptrTy.constPointerNull() ], funcType: FunctionType([ptrTy], IntType.int32))
       builder.buildRetVoid()
       return f
     }
@@ -246,7 +246,7 @@ private func compileProgramBody(
   let getCharExtern = Externs.getchar.resolve(builder)
   let flushExtern = Externs.flush.resolve(builder)
 
-  var addressPointer: IRValue = cellTape.constGEP(indices: [
+  var addressPointer: IRValue = cellTape.constGEP(type: cellTapeType, indices: [
     IntType.int32.zero(), // (*self)
     IntType.int32.zero()  //   [0]
   ])
@@ -330,11 +330,11 @@ private func compileProgramBody(
     case ".":
       // Write
       let dataValue = builder.buildLoad(addressPointer, type: cellType)
-      _ = builder.buildCall(putCharExtern, args: [dataValue])
+      _ = builder.buildCall(putCharExtern, args: [dataValue], resultType: VoidType())
       builder.currentDebugLocation = dibuilder.buildDebugLocation(at: (sourceLine, sourceColumn), in: scope)
     case ",":
       // Read
-      let readValue = builder.buildCall(getCharExtern, args: [])
+      let readValue = builder.buildCall(getCharExtern, args: [], resultType: cellType)
       builder.buildStore(readValue, to: addressPointer)
       builder.currentDebugLocation = dibuilder.buildDebugLocation(at: (sourceLine, sourceColumn), in: scope)
 
@@ -413,7 +413,7 @@ private func compileProgramBody(
   }
 
   // Flush everything
-  _ = builder.buildCall(flushExtern, args: [])
+  _ = builder.buildCall(flushExtern, args: [], resultType: VoidType())
 
   builder.buildRet(IntType.int32.zero())
 }

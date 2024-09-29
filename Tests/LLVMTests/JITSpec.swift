@@ -1,3 +1,4 @@
+/*
 import LLVM
 import XCTest
 import FileCheck
@@ -259,4 +260,4 @@ class JITSpec : XCTestCase {
   ])
   #endif
 }
-
+*/

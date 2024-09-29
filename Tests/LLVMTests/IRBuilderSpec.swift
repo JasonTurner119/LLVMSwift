@@ -48,10 +48,10 @@ class IRBuilderSpec : XCTestCase {
       // IRBUILDER-INLINE-ASM-NEXT: entry:
       let entry = main.appendBasicBlock(named: "entry")
       builder.positionAtEnd(of: entry)
-      let ty = FunctionType([ PointerType(pointee: IntType.int32) ], VoidType())
+      let ty = FunctionType([ PointerType() ], VoidType())
       let emptyASM = builder.buildInlineAssembly("", dialect: .att, type: ty, constraints: "=r,0", hasSideEffects: true, needsAlignedStack: true)
-      // IRBUILDER-INLINE-ASM-NEXT: call void asm sideeffect alignstack "\00", "=r,0\00"(i32* @a)
-      _ = builder.buildCall(emptyASM, args: [ g1 ])
+      // IRBUILDER-INLINE-ASM-NEXT: call void asm sideeffect alignstack "\00", "=r,0\00"(ptr @a)
+      _ = builder.buildCall(emptyASM, args: [ g1 ], funcType: FunctionType([IntType.int32], VoidType()))
       // IRBUILDER-INLINE-ASM-NEXT: ret void
       builder.buildRetVoid()
       // IRBUILDER-INLINE-ASM-NEXT: }
@@ -86,15 +86,15 @@ class IRBuilderSpec : XCTestCase {
       let entry = main.appendBasicBlock(named: "entry")
       builder.positionAtEnd(of: entry)
 
-      // IRBUILDERARITH-NEXT: [[A_LOAD:%[0-9]+]] = load i32, i32* @a
+      // IRBUILDERARITH-NEXT: [[A_LOAD:%[0-9]+]] = load i32, ptr @a
       let vg1 = builder.buildLoad(g1, type: IntType.int32)
-      // IRBUILDERARITH-NEXT: [[B_LOAD:%[0-9]+]] = load i32, i32* @b
+      // IRBUILDERARITH-NEXT: [[B_LOAD:%[0-9]+]] = load i32, ptr @b
       let vg2 = builder.buildLoad(g2, type: IntType.int32)
 
-      // IRBUILDERARITH-NEXT: [[VEC1_LOAD:%[0-9]+]] = load <8 x i32>, <8 x i32>* @vec1
+      // IRBUILDERARITH-NEXT: [[VEC1_LOAD:%[0-9]+]] = load <8 x i32>, ptr @vec1
       let vgVec1 = builder.buildLoad(gVec1, type: vecTy)
 
-      // IRBUILDERARITH-NEXT: [[VEC2_LOAD:%[0-9]+]] = load <8 x i32>, <8 x i32>* @vec2
+      // IRBUILDERARITH-NEXT: [[VEC2_LOAD:%[0-9]+]] = load <8 x i32>, ptr @vec2
       let vgVec2 = builder.buildLoad(gVec2, type: vecTy)
 
       // IRBUILDERARITH-NEXT: {{%[0-9]+}} = add i32 [[A_LOAD]], [[B_LOAD]]
@@ -167,9 +167,9 @@ class IRBuilderSpec : XCTestCase {
       let entry = main.appendBasicBlock(named: "entry")
       builder.positionAtEnd(of: entry)
 
-      // IRBUILDERCMP-NEXT: %0 = load i32, i32* @a
+      // IRBUILDERCMP-NEXT: %0 = load i32, ptr @a
       let vg1 = builder.buildLoad(g1, type: IntType.int32)
-      // IRBUILDERCMP-NEXT: %1 = load i32, i32* @b
+      // IRBUILDERCMP-NEXT: %1 = load i32, ptr @b
       let vg2 = builder.buildLoad(g2, type: IntType.int32)
 
       // IRBUILDERCMP-NEXT: %2 = icmp eq i32 %0, %1
@@ -220,9 +220,9 @@ class IRBuilderSpec : XCTestCase {
       let entry = main.appendBasicBlock(named: "entry")
       builder.positionAtEnd(of: entry)
 
-      // IRBUILDERFCMP-NEXT: %0 = load double, double* @a
+      // IRBUILDERFCMP-NEXT: %0 = load double, ptr @a
       let vg1 = builder.buildLoad(g1, type: FloatType.double)
-      // IRBUILDERFCMP-NEXT: %1 = load double, double* @b
+      // IRBUILDERFCMP-NEXT: %1 = load double, ptr @b
       let vg2 = builder.buildLoad(g2, type: FloatType.double)
 
       // IRBUILDERFCMP-NEXT: %2 = fcmp oeq double %0, %1
@@ -274,16 +274,16 @@ class IRBuilderSpec : XCTestCase {
       // CONTROLFLOW-NEXT: %var = alloca i64
       let variable = builder.buildAlloca(type: IntType.int64, name: "var")
 
-      // CONTROLFLOW-NEXT: store i64 1, i64* %var
+      // CONTROLFLOW-NEXT: store i64 1, ptr %var
       builder.buildStore(IntType.int64.constant(1), to: variable)
 
-      // CONTROLFLOW-NEXT: store volatile i64 1, i64* %var
+      // CONTROLFLOW-NEXT: store volatile i64 1, ptr %var
       builder.buildStore(IntType.int64.constant(1), to: variable, volatile: true)
 
-      // CONTROLFLOW-NEXT: store atomic i64 1, i64* %var
+      // CONTROLFLOW-NEXT: store atomic i64 1, ptr %var
       builder.buildStore(IntType.int64.constant(1), to: variable, ordering: .sequentiallyConsistent)
 
-      // CONTROLFLOW-NEXT: %0 = load i64, i64* %var
+      // CONTROLFLOW-NEXT: %0 = load i64, ptr %var
       let load = builder.buildLoad(variable, type: IntType.int64)
 
       // CONTROLFLOW-NEXT: %1 = icmp eq i64 %0, 0
@@ -332,29 +332,25 @@ class IRBuilderSpec : XCTestCase {
       // CAST-NEXT: %0 = alloca i64
       let alloca = builder.buildAlloca(type: IntType.int64)
 
-      // CAST-NEXT: %1 = ptrtoint i64* %0 to i64
+      // CAST-NEXT: %1 = ptrtoint ptr %0 to i64
       _ = builder.buildPtrToInt(alloca, type: IntType.int64)
 
-      // CAST-NEXT: %2 = load i64, i64* %0
+      // CAST-NEXT: %2 = load i64, ptr %0
       let val = builder.buildLoad(alloca, type: IntType.int64)
 
-      // CAST-NEXT: %3 = inttoptr i64 %2 to i64*
-      _ = builder.buildIntToPtr(val,
-                                type: PointerType(pointee: IntType.int64))
+      // CAST-NEXT: %3 = inttoptr i64 %2 to ptr
+      _ = builder.buildIntToPtr(val, type: PointerType())
 
-      // CAST-NEXT: %4 = bitcast i64* %0 to i8*
-      _ = builder.buildBitCast(alloca, type: PointerType.toVoid)
-
-      // CAST-NEXT: %5 = alloca double
+      // CAST-NEXT: %4 = alloca double
       let dblAlloca = builder.buildAlloca(type: FloatType.double)
 
-      // CAST-NEXT: %6 = load double, double* %5
+      // CAST-NEXT: %5 = load double, ptr %4
       let dblVal = builder.buildLoad(dblAlloca, type: FloatType.double)
 
-      // CAST-NEXT: %7 = fptrunc double %6 to float
+      // CAST-NEXT: %6 = fptrunc double %5 to float
       let fltVal = builder.buildFPCast(dblVal, type: FloatType.float)
 
-      // CAST-NEXT: %8 = fpext float %7 to double
+      // CAST-NEXT: %7 = fpext float %6 to double
       _ = builder.buildFPCast(fltVal, type: FloatType.double)
 
       // CAST-NEXT: ret i32 0

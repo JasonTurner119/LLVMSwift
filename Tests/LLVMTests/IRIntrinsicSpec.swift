@@ -22,44 +22,40 @@ class IRIntrinsicSpec : XCTestCase {
       let entry = main.appendBasicBlock(named: "entry")
       builder.positionAtEnd(of: entry)
 
-      // IRINTRINSIC-NEXT: [[VA_BUF:%[0-9]+]] = alloca i8*
-      let ap = builder.buildAlloca(type: PointerType(pointee: IntType.int8))
-      // IRINTRINSIC-NEXT: [[CAST_VA_BUF:%[0-9]+]] = bitcast i8** [[VA_BUF]] to i8*
-      let ap2 = builder.buildBitCast(ap, type: PointerType(pointee: IntType.int8))
+      // IRINTRINSIC-NEXT: [[VA_BUF:%[0-9]+]] = alloca ptr, align 8
+      let ap = builder.buildAlloca(type: PointerType())
 
-      // IRINTRINSIC-NEXT: call void @llvm.va_start(i8* [[CAST_VA_BUF]])
+      // IRINTRINSIC-NEXT: call void @llvm.va_start(ptr [[VA_BUF]])
       let vaStart = module.intrinsic(Intrinsic.ID.llvm_va_start)!
-      _ = builder.buildCall(vaStart, args: [ ap2 ])
+      _ = builder.buildCall(vaStart, args: [ ap ], funcType: FunctionType([PointerType()], VoidType()))
 
-      // IRINTRINSIC-NEXT: [[RET_VAL:%[0-9]+]] = va_arg i8** [[VA_BUF]], i32
+      // IRINTRINSIC-NEXT: [[RET_VAL:%[0-9]+]] = va_arg ptr [[VA_BUF]], i32
       let tmp = builder.buildVAArg(ap, type: IntType.int32)
 
-      // IRINTRINSIC-NEXT: [[VA_COPY_BUF:%[0-9]+]] = alloca i8*
-      let aq = builder.buildAlloca(type: PointerType(pointee: IntType.int8))
-      // IRINTRINSIC-NEXT: [[CAST_VA_COPY_BUF:%[0-9]+]] = bitcast i8** [[VA_COPY_BUF]] to i8*
-      let aq2 = builder.buildBitCast(aq, type: PointerType(pointee: IntType.int8))
+      // IRINTRINSIC-NEXT: [[VA_COPY_BUF:%[0-9]+]] = alloca ptr, align 8
+      let aq = builder.buildAlloca(type: PointerType())
 
-      // IRINTRINSIC-NEXT: call void @llvm.va_copy(i8* [[CAST_VA_BUF]], i8* [[CAST_VA_COPY_BUF]])
+      // IRINTRINSIC-NEXT: call void @llvm.va_copy(ptr [[VA_BUF]], ptr [[VA_COPY_BUF]])
       let vaCopy = module.intrinsic(Intrinsic.ID.llvm_va_copy)!
-      _ = builder.buildCall(vaCopy, args: [ ap2, aq2 ])
+      _ = builder.buildCall(vaCopy, args: [ ap, aq ], funcType: FunctionType([PointerType(), PointerType()], VoidType()))
 
-      // IRINTRINSIC-NEXT: call void @llvm.va_end(i8* [[CAST_VA_COPY_BUF]])
+      // IRINTRINSIC-NEXT: call void @llvm.va_end(ptr [[VA_COPY_BUF]])
       let vaEnd = module.intrinsic(Intrinsic.ID.llvm_va_end)!
-      _ = builder.buildCall(vaEnd, args: [ aq2 ])
+      _ = builder.buildCall(vaEnd, args: [ aq ], funcType: FunctionType([PointerType()], VoidType()))
 
       // IRINTRINSIC-NEXT: i32 [[RET_VAL]]
       builder.buildRet(tmp)
       // IRINTRINSIC-NEXT: }
       module.dump()
 
-      // IRINTRINSIC: ; Function Attrs: nounwind
-      // IRINTRINSIC-NEXT: declare void @llvm.va_start(i8* %0) #0
+      // IRINTRINSIC: ; Function Attrs: nocallback nofree nosync nounwind willreturn
+      // IRINTRINSIC-NEXT: declare void @llvm.va_start(ptr %0) #0
 
-      // IRINTRINSIC: ; Function Attrs: nounwind
-      // IRINTRINSIC-NEXT: declare void @llvm.va_copy(i8* %0, i8* %1) #0
+      // IRINTRINSIC: ; Function Attrs: nocallback nofree nosync nounwind willreturn
+      // IRINTRINSIC-NEXT: declare void @llvm.va_copy(ptr %0, ptr %1) #0
 
-      // IRINTRINSIC: ; Function Attrs: nounwind
-      // IRINTRINSIC-NEXT: declare void @llvm.va_end(i8* %0) #0
+      // IRINTRINSIC: ; Function Attrs: nocallback nofree nosync nounwind willreturn
+      // IRINTRINSIC-NEXT: declare void @llvm.va_end(ptr %0) #0
     })
 
     XCTAssert(fileCheckOutput(of: .stderr, withPrefixes: ["VIRTUALOVERLOAD-IRINTRINSIC"]) {
@@ -74,17 +70,17 @@ class IRIntrinsicSpec : XCTestCase {
       let entry = main.appendBasicBlock(named: "entry")
       builder.positionAtEnd(of: entry)
 
-      // VIRTUALOVERLOAD-IRINTRINSIC-NEXT: [[VAR_PTR:%[0-9]+]] = alloca i32
+      // VIRTUALOVERLOAD-IRINTRINSIC-NEXT: [[VAR_PTR:%[0-9]+]] = alloca i32, align 4
       let variable = builder.buildAlloca(type: IntType.int32)
 
-      // VIRTUALOVERLOAD-IRINTRINSIC-NEXT: store i32 1, i32* [[VAR_PTR]]
+      // VIRTUALOVERLOAD-IRINTRINSIC-NEXT: store i32 1, ptr [[VAR_PTR]], align 4
       builder.buildStore(IntType.int32.constant(1), to: variable)
 
-      // VIRTUALOVERLOAD-IRINTRINSIC-NEXT: [[COPY_PTR:%[0-9]+]] = call i32* @llvm.ssa.copy.p0i32(i32* %0)
-      let intrinsic = module.intrinsic(Intrinsic.ID.llvm_ssa_copy, parameters: [ PointerType(pointee: IntType.int32) ])!
-      let cpyVar = builder.buildCall(intrinsic, args: [variable])
+      // VIRTUALOVERLOAD-IRINTRINSIC-NEXT: [[COPY_PTR:%[0-9]+]] = call ptr @llvm.ssa.copy.p0(ptr %0)
+      let intrinsic = module.intrinsic(Intrinsic.ID.llvm_ssa_copy, parameters: [ PointerType() ])!
+      let cpyVar = builder.buildCall(intrinsic, args: [variable], funcType: FunctionType([PointerType()], PointerType()))
 
-      // VIRTUALOVERLOAD-IRINTRINSIC-NEXT: [[LOAD_VAR:%[0-9]+]] = load i32, i32* [[COPY_PTR]]
+      // VIRTUALOVERLOAD-IRINTRINSIC-NEXT: [[LOAD_VAR:%[0-9]+]] = load i32, ptr [[COPY_PTR]]
       let loadVar = builder.buildLoad(cpyVar, type: IntType.int32)
 
       // VIRTUALOVERLOAD-IRINTRINSIC-NEXT:  ret i32 [[LOAD_VAR]]
@@ -92,8 +88,8 @@ class IRIntrinsicSpec : XCTestCase {
       // VIRTUALOVERLOAD-IRINTRINSIC-NEXT:  }
       module.dump()
 
-      // VIRTUALOVERLOAD-IRINTRINSIC: ; Function Attrs: nounwind readnone
-      // VIRTUALOVERLOAD-IRINTRINSIC-NEXT: declare i32* @llvm.ssa.copy.p0i32(i32* returned %0) #0
+      // VIRTUALOVERLOAD-IRINTRINSIC: ; Function Attrs: nocallback nofree nosync nounwind willreturn memory(none)
+      // VIRTUALOVERLOAD-IRINTRINSIC-NEXT: declare ptr @llvm.ssa.copy.p0(ptr returned %0) #0
     })
 
     XCTAssert(fileCheckOutput(of: .stderr, withPrefixes: ["INTRINSIC-FAMILY-RESOLVE"]) {
@@ -122,42 +118,42 @@ class IRIntrinsicSpec : XCTestCase {
 
       // INTRINSIC-FAMILY-RESOLVE: call double @llvm.sin.f64(double
       let sinf64 = module.intrinsic(Intrinsic.ID.llvm_sin, parameters: [ FloatType.double ])!
-      _ = builder.buildCall(sinf64, args: [double])
+      _ = builder.buildCall(sinf64, args: [double], funcType: FunctionType([FloatType.double], FloatType.double))
       // INTRINSIC-FAMILY-RESOLVE-NEXT: call double @llvm.cos.f64(double
       let cosf64 = module.intrinsic(Intrinsic.ID.llvm_cos, parameters: [ FloatType.double ])!
-      _ = builder.buildCall(cosf64, args: [double])
+      _ = builder.buildCall(cosf64, args: [double], funcType: FunctionType([FloatType.double], FloatType.double))
       // INTRINSIC-FAMILY-RESOLVE-NEXT: call double @llvm.sqrt.f64(double
       let sqrtf64 = module.intrinsic(Intrinsic.ID.llvm_sqrt, parameters: [ FloatType.double ])!
-      _ = builder.buildCall(sqrtf64, args: [double])
+      _ = builder.buildCall(sqrtf64, args: [double], funcType: FunctionType([FloatType.double], FloatType.double))
       // INTRINSIC-FAMILY-RESOLVE-NEXT: call double @llvm.log.f64(double
       let logf64 = module.intrinsic(Intrinsic.ID.llvm_log, parameters: [ FloatType.double ])!
-      _ = builder.buildCall(logf64, args: [double])
+      _ = builder.buildCall(logf64, args: [double], funcType: FunctionType([FloatType.double], FloatType.double))
 
       // INTRINSIC-FAMILY-RESOLVE: call float @llvm.sin.f32(float
       let sinf32 = module.intrinsic(Intrinsic.ID.llvm_sin, parameters: [ FloatType.float ])!
-      _ = builder.buildCall(sinf32, args: [float])
+      _ = builder.buildCall(sinf32, args: [float], funcType: FunctionType([FloatType.float], FloatType.float))
       // INTRINSIC-FAMILY-RESOLVE-NEXT: call float @llvm.cos.f32(float
       let cosf32 = module.intrinsic(Intrinsic.ID.llvm_cos, parameters: [ FloatType.float ])!
-      _ = builder.buildCall(cosf32, args: [float])
+      _ = builder.buildCall(cosf32, args: [float], funcType: FunctionType([FloatType.float], FloatType.float))
       // INTRINSIC-FAMILY-RESOLVE-NEXT: call float @llvm.sqrt.f32(float
       let sqrtf32 = module.intrinsic(Intrinsic.ID.llvm_sqrt, parameters: [ FloatType.float ])!
-      _ = builder.buildCall(sqrtf32, args: [float])
+      _ = builder.buildCall(sqrtf32, args: [float], funcType: FunctionType([FloatType.float], FloatType.float))
       // INTRINSIC-FAMILY-RESOLVE-NEXT: call float @llvm.log.f32(float
       let logf32 = module.intrinsic(Intrinsic.ID.llvm_log, parameters: [ FloatType.float ])!
-      _ = builder.buildCall(logf32, args: [float])
+      _ = builder.buildCall(logf32, args: [float], funcType: FunctionType([FloatType.float], FloatType.float))
 
       // INTRINSIC-FAMILY-RESOLVE: call half @llvm.sin.f16(half
       let sinf16 = module.intrinsic(Intrinsic.ID.llvm_sin, parameters: [ FloatType.half ])!
-      _ = builder.buildCall(sinf16, args: [half])
+      _ = builder.buildCall(sinf16, args: [half], funcType: FunctionType([FloatType.half], FloatType.half))
       // INTRINSIC-FAMILY-RESOLVE-NEXT: call half @llvm.cos.f16(half
       let cosf16 = module.intrinsic(Intrinsic.ID.llvm_cos, parameters: [ FloatType.half ])!
-      _ = builder.buildCall(cosf16, args: [half])
+      _ = builder.buildCall(cosf16, args: [half], funcType: FunctionType([FloatType.half], FloatType.half))
       // INTRINSIC-FAMILY-RESOLVE-NEXT: call half @llvm.sqrt.f16(half
       let sqrtf16 = module.intrinsic(Intrinsic.ID.llvm_sqrt, parameters: [ FloatType.half ])!
-      _ = builder.buildCall(sqrtf16, args: [half])
+      _ = builder.buildCall(sqrtf16, args: [half], funcType: FunctionType([FloatType.half], FloatType.half))
       // INTRINSIC-FAMILY-RESOLVE-NEXT: call half @llvm.log.f16(half
       let logf16 = module.intrinsic(Intrinsic.ID.llvm_log, parameters: [ FloatType.half ])!
-      _ = builder.buildCall(logf16, args: [half])
+      _ = builder.buildCall(logf16, args: [half], funcType: FunctionType([FloatType.half], FloatType.half))
 
       builder.buildRet(IntType.int32.zero())
       module.dump()

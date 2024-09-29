@@ -50,13 +50,13 @@ class UnitSpec : XCTestCase {
       IntType.int1,
       IntType.int8,
       IntType.int1,
-      PointerType(pointee: IntType.int8),
+      PointerType(),
     ], isPacked: true, in: Context.global)
     let unpackedStruct = StructType(elementTypes: [
       IntType.int1,
       IntType.int8,
       IntType.int1,
-      PointerType(pointee: IntType.int8),
+      PointerType(),
     ], isPacked: false, in: Context.global)
 
     let packedLayout = mod.dataLayout.layout(of: packedStruct)
@@ -88,13 +88,13 @@ class UnitSpec : XCTestCase {
       IntType.int1,
       IntType.int8,
       IntType.int1,
-      PointerType(pointee: IntType.int8),
+      PointerType(),
     ], isPacked: true, in: Context.global)
     let unpackedStruct = StructType(elementTypes: [
       IntType.int1,
       IntType.int8,
       IntType.int1,
-      PointerType(pointee: IntType.int8),
+      PointerType(),
     ], isPacked: false, in: Context.global)
 
     let packedLayout64 = mod.dataLayout.layout(of: packedStruct)

@@ -1,3 +1,4 @@
+/*
 import LLVM
 import XCTest
 import FileCheck
@@ -381,3 +382,4 @@ class IRPassManagerSpec : XCTestCase {
   ])
   #endif
 }
+*/

@@ -32,5 +32,5 @@ let package = Package(
       name: "LLVMTests",
       dependencies: ["LLVM", "FileCheck"]),
   ],
-  cxxLanguageStandard: .cxx14
+  cxxLanguageStandard: .cxx1z
 )

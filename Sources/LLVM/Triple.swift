@@ -418,6 +418,8 @@ extension Triple {
     case armeb = "armeb"
     ///  AArch64 (little endian): aarch64
     case aarch64 = "aarch64"
+    ///  Arm64 (little endian): aarch64
+    case arm64 = "arm64"
     ///  AArch64 (big endian): aarch64_be
     case aarch64_be = "aarch64_be"
     ///  ARC: Synopsys ARC
@@ -536,13 +538,14 @@ extension Triple {
           case arm
           case thumb
           case aarch64
+          case arm64
         }
         func parseISA(_ Arch: Substring) -> ARMISA {
           switch Arch {
           case let x where x.starts(with: "aarch64"):
             return .aarch64
           case let x where x.starts(with: "arm64"):
-            return .aarch64
+            return .arm64
           case let x where x.starts(with: "thumb"):
             return .thumb
           case let x where x.starts(with: "arm"):
@@ -592,6 +595,8 @@ extension Triple {
             arch = .thumb
           case .aarch64:
             arch = .aarch64
+          case .arm64:
+            arch = .arm64
           case .invalid:
             break
           }
@@ -602,6 +607,8 @@ extension Triple {
           case .thumb:
             arch = .thumbeb
           case .aarch64:
+            arch = .aarch64_be
+          case .arm64:
             arch = .aarch64_be
           case .invalid:
             break
@@ -662,7 +669,7 @@ extension Triple {
       case "arc":
         self = .arc
       case "arm64":
-        self = .aarch64
+        self = .arm64
       case "arm":
         self = .arm
       case "armeb":
@@ -847,6 +854,7 @@ extension Triple {
       case .renderscript32:
         return 32
 
+      case .arm64: fallthrough
       case .aarch64: fallthrough
       case .aarch64_be: fallthrough
       case .amdgcn: fallthrough
@@ -1366,7 +1374,7 @@ extension Triple {
     ///   architecture and operating system.
     public static func `default`(for arch: Architecture, os: OS) -> ObjectFormat {
       switch arch {
-      case .unknown, .aarch64, .arm, .thumb, .x86, .x86_64:
+      case .unknown, .aarch64, .arm64, .arm, .thumb, .x86, .x86_64:
         if os.isDarwin {
           return .machO
         } else if os.isWindows {

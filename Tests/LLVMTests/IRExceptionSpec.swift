@@ -5,7 +5,7 @@ import Foundation
 
 class IRExceptionSpec : XCTestCase {
   private let exceptType = StructType(elementTypes: [
-    PointerType(pointee: IntType.int8),
+    PointerType(),
     IntType.int32,
   ])
 
@@ -43,7 +43,7 @@ class IRExceptionSpec : XCTestCase {
       let entry = main.appendBasicBlock(named: "entry")
       builder.positionAtEnd(of: entry)
 
-      // IRCLEANUP-NEXT: %0 = landingpad { i8*, i32 }
+      // IRCLEANUP-NEXT: %0 = landingpad { ptr, i32 }
       // IRCLEANUP-NEXT:         cleanup
       _ = builder.buildLandingPad(returning: exceptType, clauses: [], cleanup: true)
 
@@ -59,8 +59,8 @@ class IRExceptionSpec : XCTestCase {
       let module = Module(name: "IRBuilderTest")
       let builder = IRBuilder(module: module)
 
-      let except1 = builder.addGlobal("except1", type: PointerType(pointee: IntType.int8))
-      let except2 = builder.addGlobal("except2", type: PointerType(pointee: IntType.int8))
+      let except1 = builder.addGlobal("except1", type: PointerType())
+      let except2 = builder.addGlobal("except2", type: PointerType())
 
       // IRCATCH: define void @main() {
       let main = builder.addFunction("main",
@@ -69,9 +69,9 @@ class IRExceptionSpec : XCTestCase {
       let entry = main.appendBasicBlock(named: "entry")
       builder.positionAtEnd(of: entry)
 
-      // IRCATCH-NEXT: %0 = landingpad { i8*, i32 }
-      // IRCATCH-NEXT:         catch i8** @except1
-      // IRCATCH-NEXT:         catch i8** @except2
+      // IRCATCH-NEXT: %0 = landingpad { ptr, i32 }
+      // IRCATCH-NEXT:         catch ptr @except1
+      // IRCATCH-NEXT:         catch ptr @except2
       _ = builder.buildLandingPad(returning: exceptType, clauses: [ .`catch`(except1), .`catch`(except2) ], cleanup: false)
 
       // IRCATCH-NEXT: ret void
@@ -86,9 +86,9 @@ class IRExceptionSpec : XCTestCase {
       let module = Module(name: "IRBuilderTest")
       let builder = IRBuilder(module: module)
 
-      let except1 = builder.addGlobal("except1", type: PointerType(pointee: IntType.int8))
-      let except2 = builder.addGlobal("except2", type: PointerType(pointee: IntType.int8))
-      let except3 = builder.addGlobal("except3", type: PointerType(pointee: IntType.int8))
+      let except1 = builder.addGlobal("except1", type: PointerType())
+      let except2 = builder.addGlobal("except2", type: PointerType())
+      let except3 = builder.addGlobal("except3", type: PointerType())
 
       // IRCATCHFILTER: define void @main() {
       let main = builder.addFunction("main",
@@ -97,9 +97,9 @@ class IRExceptionSpec : XCTestCase {
       let entry = main.appendBasicBlock(named: "entry")
       builder.positionAtEnd(of: entry)
 
-      // IRCATCHFILTER-NEXT: %0 = landingpad { i8*, i32 }
-      // IRCATCHFILTER-NEXT:         catch i8** @except1
-      // IRCATCHFILTER-NEXT:         filter [2 x i8**] [i8** @except2, i8** @except3]
+      // IRCATCHFILTER-NEXT: %0 = landingpad { ptr, i32 }
+      // IRCATCHFILTER-NEXT:         catch ptr @except1
+      // IRCATCHFILTER-NEXT:         filter [2 x ptr] [ptr @except2, ptr @except3]
       _ = builder.buildLandingPad(
         returning: exceptType,
         clauses: [ .`catch`(except1), .filter(except1.type, [ except2, except3 ]) ],

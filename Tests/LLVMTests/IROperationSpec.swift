@@ -32,14 +32,14 @@ class IROperationSpec : XCTestCase {
       let entry = main.appendBasicBlock(named: "entry")
       builder.positionAtEnd(of: entry)
 
-      // BINARYOP-NEXT: %0 = load i32, i32* @a
+      // BINARYOP-NEXT: %0 = load i32, ptr @a
       let vgi1 = builder.buildLoad(gi1, type: IntType.int32)
-      // BINARYOP-NEXT: %1 = load i32, i32* @b
+      // BINARYOP-NEXT: %1 = load i32, ptr @b
       let vgi2 = builder.buildLoad(gi2, type: IntType.int32)
 
-      // BINARYOP-NEXT: %2 = load float, float* @c
+      // BINARYOP-NEXT: %2 = load float, ptr @c
       let vgf1 = builder.buildLoad(gf1, type: FloatType.float)
-      // BINARYOP-NEXT: %3 = load float, float* @d
+      // BINARYOP-NEXT: %3 = load float, ptr @d
       let vgf2 = builder.buildLoad(gf2, type: FloatType.float)
 
       // BINARYOP-NEXT: %4 = add i32 %0, %1
@@ -109,9 +109,9 @@ class IROperationSpec : XCTestCase {
       let entry = main.appendBasicBlock(named: "entry")
       builder.positionAtEnd(of: entry)
 
-      // CASTOP-NEXT: %0 = load i32, i32* @a
+      // CASTOP-NEXT: %0 = load i32, ptr @a
       let vgi = builder.buildLoad(gi, type: IntType.int32)
-      // CASTOP-NEXT: %1 = load float, float* @f
+      // CASTOP-NEXT: %1 = load float, ptr @f
       let vgf = builder.buildLoad(gf, type: FloatType.float)
 
       // CASTOP-NEXT: %2 = trunc i32 %0 to i16
@@ -132,14 +132,14 @@ class IROperationSpec : XCTestCase {
       _ = builder.buildCast(.fpTrunc, value: vgf, type: FloatType.half)
       // CASTOP-NEXT: %10 = fpext float %1 to fp128
       _ = builder.buildCast(.fpext, value: vgf, type: FloatType.fp128)
-      // CASTOP-NEXT: %11 = inttoptr i32 %0 to i32*
-      _ = builder.buildCast(.intToPtr, value: vgi, type: PointerType(pointee: IntType.int32))
+      // CASTOP-NEXT: %11 = inttoptr i32 %0 to ptr
+      _ = builder.buildCast(.intToPtr, value: vgi, type: PointerType())
       // CASTOP-NEXT: %12 = bitcast i32 %0 to float
       _ = builder.buildCast(.bitCast, value: vgi, type: FloatType.float)
 
       // FIXME: These are not correct
       // _ = builder.buildCast(.ptrToInt, value: gi, type: IntType.int32)
-      // _ = builder.buildCast(.addrSpaceCast, value: gi, type: PointerType(pointee: IntType.int32, addressSpace: 1))
+      // _ = builder.buildCast(.addrSpaceCast, value: gi, type: PointerType(addressSpace: 1))
 
       // CASTOP-NEXT: ret void
       builder.buildRetVoid()

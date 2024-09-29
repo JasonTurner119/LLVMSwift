@@ -1105,7 +1105,7 @@ extension DIBuilder {
   ) -> ImportedEntityMetadata {
     guard let mod = LLVMDIBuilderCreateImportedModuleFromModule(
       self.llvm, context.asMetadata(), module.asMetadata(),
-      file.asMetadata(), UInt32(line))
+      file.asMetadata(), UInt32(line), nil, 0)
     else {
       fatalError("Failed to allocate metadata")
     }
@@ -1128,7 +1128,7 @@ extension DIBuilder {
     guard let mod = LLVMDIBuilderCreateImportedDeclaration(
       self.llvm, context.asMetadata(),
       declaration.asMetadata(), 
-      file.asMetadata(), UInt32(line), name, name.count)
+      file.asMetadata(), UInt32(line), name, name.count, nil, 0)
     else {
       fatalError("Failed to allocate metadata")
     }
@@ -1220,7 +1220,7 @@ extension DIBuilder {
   ///   - value: The constant value.
   public func buildConstantExpresion(_ value: Int) -> ExpressionMetadata {
     guard let expr = LLVMDIBuilderCreateConstantValueExpression(
-      self.llvm, Int64(value))
+      self.llvm, UInt64(value))
     else {
       fatalError("Failed to allocate metadata")
     }
