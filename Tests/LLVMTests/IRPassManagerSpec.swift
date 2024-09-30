@@ -1,4 +1,3 @@
-/*
 import LLVM
 import XCTest
 import FileCheck
@@ -115,29 +114,29 @@ class IRPassManagerSpec : XCTestCase {
       // CHECK-EXECUTE-STDOPT:    %2 = alloca i32, align 4
       // CHECK-EXECUTE-STDOPT:    %3 = alloca i32, align 4
       // CHECK-EXECUTE-STDOPT:    %4 = alloca i32, align 4
-      // CHECK-EXECUTE-STDOPT:    store i32 %0, i32* %2
-      // CHECK-EXECUTE-STDOPT:    store i32 %1, i32* %3
-      // CHECK-EXECUTE-STDOPT:    store i32 4, i32* %4
-      // CHECK-EXECUTE-STDOPT:    %5 = load i32, i32* %2, align 4
+      // CHECK-EXECUTE-STDOPT:    store i32 %0, ptr %2
+      // CHECK-EXECUTE-STDOPT:    store i32 %1, ptr %3
+      // CHECK-EXECUTE-STDOPT:    store i32 4, ptr %4
+      // CHECK-EXECUTE-STDOPT:    %5 = load i32, ptr %2, align 4
       // CHECK-EXECUTE-STDOPT:    %6 = icmp eq i32 %5, 1
       // CHECK-EXECUTE-STDOPT:    br i1 %6, label %block1, label %block2
 
       // CHECK-EXECUTE-STDOPT:    block1:
-      // CHECK-EXECUTE-STDOPT:    %7 = load i32, i32* %2, align 4
-      // CHECK-EXECUTE-STDOPT:    %8 = load i32, i32* %4, align 4
+      // CHECK-EXECUTE-STDOPT:    %7 = load i32, ptr %2, align 4
+      // CHECK-EXECUTE-STDOPT:    %8 = load i32, ptr %4, align 4
       // CHECK-EXECUTE-STDOPT:    %9 = add nsw i32 %7, %8
-      // CHECK-EXECUTE-STDOPT:    store i32 %9, i32* %4
+      // CHECK-EXECUTE-STDOPT:    store i32 %9, ptr %4
       // CHECK-EXECUTE-STDOPT:    br label %merge
 
       // CHECK-EXECUTE-STDOPT:    block2:
-      // CHECK-EXECUTE-STDOPT:    %10 = load i32, i32* %3, align 4
-      // CHECK-EXECUTE-STDOPT:    %11 = load i32, i32* %4, align 4
+      // CHECK-EXECUTE-STDOPT:    %10 = load i32, ptr %3, align 4
+      // CHECK-EXECUTE-STDOPT:    %11 = load i32, ptr %4, align 4
       // CHECK-EXECUTE-STDOPT:    %12 = add nsw i32 %10, %11
-      // CHECK-EXECUTE-STDOPT:    store i32 %12, i32* %4
+      // CHECK-EXECUTE-STDOPT:    store i32 %12, ptr %4
       // CHECK-EXECUTE-STDOPT:    br label %merge
 
       // CHECK-EXECUTE-STDOPT:    merge:
-      // CHECK-EXECUTE-STDOPT:    %13 = load i32, i32* %4, align 4
+      // CHECK-EXECUTE-STDOPT:    %13 = load i32, ptr %4, align 4
       // CHECK-EXECUTE-STDOPT:    ret i32 %13
       // CHECK-EXECUTE-STDOPT  }
 
@@ -148,7 +147,7 @@ class IRPassManagerSpec : XCTestCase {
       // CHECK-EXECUTE-STDOPT: ; ModuleID = 'Test'
       // CHECK-EXECUTE-STDOPT: source_filename = "Test"
 
-      // CHECK-EXECUTE-STDOPT: ; Function Attrs: norecurse nounwind readnone
+      // CHECK-EXECUTE-STDOPT: ; Function Attrs: mustprogress nofree norecurse nosync nounwind willreturn memory(none)
       // CHECK-EXECUTE-STDOPT: define i32 @fun(i32 %0, i32 %1) local_unnamed_addr #0 {
       // CHECK-EXECUTE-STDOPT:   entry:
       // CHECK-EXECUTE-STDOPT:   %2 = icmp eq i32 %0, 1
@@ -180,29 +179,29 @@ class IRPassManagerSpec : XCTestCase {
       // CHECK-EXECUTE-MASK:    %2 = alloca i32, align 4
       // CHECK-EXECUTE-MASK:    %3 = alloca i32, align 4
       // CHECK-EXECUTE-MASK:    %4 = alloca i32, align 4
-      // CHECK-EXECUTE-MASK:    store i32 %0, i32* %2
-      // CHECK-EXECUTE-MASK:    store i32 %1, i32* %3
-      // CHECK-EXECUTE-MASK:    store i32 4, i32* %4
-      // CHECK-EXECUTE-MASK:    %5 = load i32, i32* %2, align 4
+      // CHECK-EXECUTE-MASK:    store i32 %0, ptr %2
+      // CHECK-EXECUTE-MASK:    store i32 %1, ptr %3
+      // CHECK-EXECUTE-MASK:    store i32 4, ptr %4
+      // CHECK-EXECUTE-MASK:    %5 = load i32, ptr %2, align 4
       // CHECK-EXECUTE-MASK:    %6 = icmp eq i32 %5, 1
       // CHECK-EXECUTE-MASK:    br i1 %6, label %block1, label %block2
 
       // CHECK-EXECUTE-MASK:    block1:
-      // CHECK-EXECUTE-MASK:    %7 = load i32, i32* %2, align 4
-      // CHECK-EXECUTE-MASK:    %8 = load i32, i32* %4, align 4
+      // CHECK-EXECUTE-MASK:    %7 = load i32, ptr %2, align 4
+      // CHECK-EXECUTE-MASK:    %8 = load i32, ptr %4, align 4
       // CHECK-EXECUTE-MASK:    %9 = add nsw i32 %7, %8
-      // CHECK-EXECUTE-MASK:    store i32 %9, i32* %4
+      // CHECK-EXECUTE-MASK:    store i32 %9, ptr %4
       // CHECK-EXECUTE-MASK:    br label %merge
 
       // CHECK-EXECUTE-MASK:    block2:
-      // CHECK-EXECUTE-MASK:    %10 = load i32, i32* %3, align 4
-      // CHECK-EXECUTE-MASK:    %11 = load i32, i32* %4, align 4
+      // CHECK-EXECUTE-MASK:    %10 = load i32, ptr %3, align 4
+      // CHECK-EXECUTE-MASK:    %11 = load i32, ptr %4, align 4
       // CHECK-EXECUTE-MASK:    %12 = add nsw i32 %10, %11
-      // CHECK-EXECUTE-MASK:    store i32 %12, i32* %4
+      // CHECK-EXECUTE-MASK:    store i32 %12, ptr %4
       // CHECK-EXECUTE-MASK:    br label %merge
 
       // CHECK-EXECUTE-MASK:    merge:
-      // CHECK-EXECUTE-MASK:    %13 = load i32, i32* %4, align 4
+      // CHECK-EXECUTE-MASK:    %13 = load i32, ptr %4, align 4
       // CHECK-EXECUTE-MASK:    ret i32 %13
       // CHECK-EXECUTE-MASK:  }
 
@@ -218,34 +217,34 @@ class IRPassManagerSpec : XCTestCase {
       // CHECK-EXECUTE-MASK:    %2 = alloca i32, align 4
       // CHECK-EXECUTE-MASK:    %3 = alloca i32, align 4
       // CHECK-EXECUTE-MASK:    %4 = alloca i32, align 4
-      // CHECK-EXECUTE-MASK:    store i32 %0, i32* %2
-      // CHECK-EXECUTE-MASK:    store i32 %1, i32* %3
-      // CHECK-EXECUTE-MASK:    store i32 4, i32* %4
-      // CHECK-EXECUTE-MASK:    %5 = load i32, i32* %2, align 4
+      // CHECK-EXECUTE-MASK:    store i32 %0, ptr %2
+      // CHECK-EXECUTE-MASK:    store i32 %1, ptr %3
+      // CHECK-EXECUTE-MASK:    store i32 4, ptr %4
+      // CHECK-EXECUTE-MASK:    %5 = load i32, ptr %2, align 4
       // CHECK-EXECUTE-MASK:    %6 = icmp eq i32 %5, 1
       // CHECK-EXECUTE-MASK:    br i1 %6, label %block1, label %block2
 
       // CHECK-EXECUTE-MASK:    block1:
-      // CHECK-EXECUTE-MASK:    %7 = load i32, i32* %2, align 4
-      // CHECK-EXECUTE-MASK:    %8 = load i32, i32* %4, align 4
+      // CHECK-EXECUTE-MASK:    %7 = load i32, ptr %2, align 4
+      // CHECK-EXECUTE-MASK:    %8 = load i32, ptr %4, align 4
       // CHECK-EXECUTE-MASK:    %9 = add nsw i32 %7, %8
-      // CHECK-EXECUTE-MASK:    store i32 %9, i32* %4
+      // CHECK-EXECUTE-MASK:    store i32 %9, ptr %4
       // CHECK-EXECUTE-MASK:    br label %merge
 
       // CHECK-EXECUTE-MASK:    block2:
-      // CHECK-EXECUTE-MASK:    %10 = load i32, i32* %3, align 4
-      // CHECK-EXECUTE-MASK:    %11 = load i32, i32* %4, align 4
+      // CHECK-EXECUTE-MASK:    %10 = load i32, ptr %3, align 4
+      // CHECK-EXECUTE-MASK:    %11 = load i32, ptr %4, align 4
       // CHECK-EXECUTE-MASK:    %12 = add nsw i32 %10, %11
-      // CHECK-EXECUTE-MASK:    store i32 %12, i32* %4
+      // CHECK-EXECUTE-MASK:    store i32 %12, ptr %4
       // CHECK-EXECUTE-MASK:    br label %merge
 
       // CHECK-EXECUTE-MASK:    merge:
-      // CHECK-EXECUTE-MASK:    %13 = load i32, i32* %4, align 4
+      // CHECK-EXECUTE-MASK:    %13 = load i32, ptr %4, align 4
       // CHECK-EXECUTE-MASK:    ret i32 %13
       // CHECK-EXECUTE-MASK:  }
     })
   }
-
+/*
   func testIdempotentInternalize() {
     let module = Module(name: "Internalize")
     let builder = IRBuilder(module: module)
@@ -323,7 +322,7 @@ class IRPassManagerSpec : XCTestCase {
       }
     })
   }
-
+*/
   private func createModule() -> Module {
     let module = Module(name: "Test")
 
@@ -382,4 +381,3 @@ class IRPassManagerSpec : XCTestCase {
   ])
   #endif
 }
-*/

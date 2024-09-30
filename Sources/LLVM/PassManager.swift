@@ -1,37 +1,42 @@
-/*
- 
+
  #if SWIFT_PACKAGE
 import cllvm
 #endif
 
-/// A subset of supported LLVM IR optimizer passes.
-public enum Pass {
+// MARK: Deprecated
+
+extension Pass {
   ///  This pass uses the SSA based Aggressive DCE algorithm.  This algorithm
   /// assumes instructions are dead until proven otherwise, which makes
   /// it more successful are removing non-obviously dead instructions.
-  case aggressiveDCE
+  @available(*, deprecated, message: "Use pass names from LLVM's new Pass Manager.")
+  public static let aggressiveDCE = Pass("")
   /// This pass uses a bit-tracking DCE algorithm in order to remove
   /// computations of dead bits.
-  case bitTrackingDCE
+  @available(*, deprecated, message: "Use pass names from LLVM's new Pass Manager.")
+  public static let bitTrackingDCE = Pass("")
   /// Use assume intrinsics to set load/store alignments.
-  case alignmentFromAssumptions
+  @available(*, deprecated, message: "Use pass names from LLVM's new Pass Manager.")
+  public static let alignmentFromAssumptions = Pass("")
   /// Merge basic blocks, eliminate unreachable blocks, simplify terminator
   /// instructions, etc.
-  case cfgSimplification
+  @available(*, deprecated, message: "Use pass names from LLVM's new Pass Manager.")
+  public static let cfgSimplification = Pass("")
   /// This pass deletes stores that are post-dominated by must-aliased stores
   /// and are not loaded used between the stores.
-  case deadStoreElimination
+  @available(*, deprecated, message: "Use pass names from LLVM's new Pass Manager.")
+  public static let deadStoreElimination = Pass("")
   /// Converts vector operations into scalar operations.
-  case scalarizer
+  @available(*, deprecated, message: "Use pass names from LLVM's new Pass Manager.")
+  public static let scalarizer = Pass("")
   /// This pass merges loads and stores in diamonds. Loads are hoisted into the
   /// header, while stores sink into the footer.
-  case mergedLoadStoreMotion
-  /// This pass performs global value numbering and redundant load elimination
-  /// cotemporaneously.
-  case gvn
+  @available(*, deprecated, message: "Use pass names from LLVM's new Pass Manager.")
+  public static let mergedLoadStoreMotion = Pass("")
   /// Transform induction variables in a program to all use a single canonical
   /// induction variable per loop.
-  case indVarSimplify
+  @available(*, deprecated, message: "Use pass names from LLVM's new Pass Manager.")
+  public static let indVarSimplify = Pass("")
   /// Combine instructions to form fewer, simple instructions. This pass does
   /// not modify the CFG, and has a tendency to make instructions dead, so a
   /// subsequent DCE pass is useful.
@@ -45,52 +50,49 @@ public enum Pass {
   /// ```asm
   /// %Z = add int 2, %X
   /// ```
-  case instructionCombining
-  /// Working in conjunction with the linker, iterate through all functions and
-  /// global values in the module and attempt to change their linkage from
-  /// external to internal.
-  ///
-  /// To preserve the linkage of a global value, return `true` from the given
-  /// callback.
-  case internalize(mustPreserve: (IRGlobal) -> Bool)
-  /// Working in conjunction with the linker, iterate through all functions and
-  /// global values in the module and attempt to change their linkage from
-  /// external to internal.
-  ///
-  /// When a function with the name "main" is encountered, if the value of
-  /// `preserveMain` is `true`, "main" will not be internalized.
-  case internalizeAll(preserveMain: Bool)
+  @available(*, deprecated, message: "Use pass names from LLVM's new Pass Manager.")
+  public static let instructionCombining = Pass("")
   /// Thread control through mult-pred/multi-succ blocks where some preds
   /// always go to some succ. Thresholds other than minus one override the
   /// internal BB duplication default threshold.
-  case jumpThreading
-  /// This pass is a loop invariant code motion and memory promotion pass.
-  case licm
+  @available(*, deprecated, message: "Use pass names from LLVM's new Pass Manager.")
+  public static let jumpThreading = Pass("")
   /// This pass performs DCE of non-infinite loops that it can prove are dead.
-  case loopDeletion
+  @available(*, deprecated, message: "Use pass names from LLVM's new Pass Manager.")
+  public static let loopDeletion = Pass("")
   /// This pass recognizes and replaces idioms in loops.
-  case loopIdiom
+  @available(*, deprecated, message: "Use pass names from LLVM's new Pass Manager.")
+  public static let loopIdiom = Pass("")
   /// This pass is a simple loop rotating pass.
-  case loopRotate
+  @available(*, deprecated, message: "Use pass names from LLVM's new Pass Manager.")
+  public static let loopRotate = Pass("")
   /// This pass is a simple loop rerolling pass.
-  case loopReroll
+  @available(*, deprecated, message: "Use pass names from LLVM's new Pass Manager.")
+  public static let loopReroll = Pass("")
   /// This pass is a simple loop unrolling pass.
-  case loopUnroll
+  @available(*, deprecated, message: "Use pass names from LLVM's new Pass Manager.")
+  public static let loopUnroll = Pass("")
   /// This pass is a simple loop unroll-and-jam pass.
-  case loopUnrollAndJam
+  @available(*, deprecated, message: "Use pass names from LLVM's new Pass Manager.")
+  public static let loopUnrollAndJam = Pass("")
   /// This pass is a simple loop unswitching pass.
-  case loopUnswitch
+  @available(*, deprecated, message: "Use pass names from LLVM's new Pass Manager.")
+  public static let loopUnswitch = Pass("")
   /// This pass lowers atomic intrinsics to non-atomic form for use in a known
   /// non-preemptible environment.
-  case lowerAtomic
+  @available(*, deprecated, message: "Use pass names from LLVM's new Pass Manager.")
+  public static let lowerAtomic = Pass("")
   /// This pass performs optimizations related to eliminating `memcpy` calls
   /// and/or combining multiple stores into memset's.
-  case memCpyOpt
+  @available(*, deprecated, message: "Use pass names from LLVM's new Pass Manager.")
+  public static let memCpyOpt = Pass("")
   /// Tries to inline the fast path of library calls such as sqrt.
-  case partiallyInlineLibCalls
+  @available(*, deprecated, message: "Use pass names from LLVM's new Pass Manager.")
+  public static let partiallyInlineLibCalls = Pass("")
   /// This pass converts SwitchInst instructions into a sequence of chained
   /// binary branch instructions.
-  case lowerSwitch
+  @available(*, deprecated, message: "Use pass names from LLVM's new Pass Manager.")
+  public static let lowerSwitch = Pass("")
   /// This pass is used to promote memory references to
   /// be register references. A simple example of the transformation performed
   /// by this pass is going from code like this:
@@ -107,35 +109,36 @@ public enum Pass {
   /// ```asm
   /// ret i32 42
   /// ```
-  case promoteMemoryToRegister
+  @available(*, deprecated, message: "Use pass names from LLVM's new Pass Manager.")
+  public static let promoteMemoryToRegister = Pass("")
   /// Adds DWARF discriminators to the IR.  Discriminators are
   /// used to decide what CFG path was taken inside sub-graphs whose instructions
   /// share the same line and column number information.
-  case addDiscriminators
-  /// This pass reassociates commutative expressions in an order that
-  /// is designed to promote better constant propagation, GCSE, LICM, PRE, etc.
-  ///
-  /// For example:
-  /// ```
-  /// 4 + (x + 5)  ->  x + (4 + 5)
-  /// ```
-  case reassociate
+  @available(*, deprecated, message: "Use pass names from LLVM's new Pass Manager.")
+  public static let addDiscriminators = Pass("")
   /// Sparse conditional constant propagation.
-  case sccp
+  @available(*, deprecated, message: "Use pass names from LLVM's new Pass Manager.")
+  public static let sccp = Pass("")
   /// This pass eliminates call instructions to the current function which occur
   /// immediately before return instructions.
-  case tailCallElimination
+  @available(*, deprecated, message: "Use pass names from LLVM's new Pass Manager.")
+  public static let tailCallElimination = Pass("")
   /// A worklist driven constant propagation pass.
-  case constantPropagation
+  @available(*, deprecated, message: "Use pass names from LLVM's new Pass Manager.")
+  public static let constantPropagation = Pass("")
   /// This pass is used to demote registers to memory references. It basically
   /// undoes the `.promoteMemoryToRegister` pass to make CFG hacking easier.
-  case demoteMemoryToRegister
+  @available(*, deprecated, message: "Use pass names from LLVM's new Pass Manager.")
+  public static let demoteMemoryToRegister = Pass("")
   /// Propagate CFG-derived value information
-  case correlatedValuePropagation
+  @available(*, deprecated, message: "Use pass names from LLVM's new Pass Manager.")
+  public static let correlatedValuePropagation = Pass("")
   /// This pass performs a simple and fast CSE pass over the dominator tree.
-  case earlyCSE
+  @available(*, deprecated, message: "Use pass names from LLVM's new Pass Manager.")
+  public static let earlyCSE = Pass("")
   ///  Removes `llvm.expect` intrinsics and creates "block_weights" metadata.
-  case lowerExpectIntrinsic
+  @available(*, deprecated, message: "Use pass names from LLVM's new Pass Manager.")
+  public static let lowerExpectIntrinsic = Pass("")
   /// Adds metadata to LLVM IR types and performs metadata-based
   /// Type-Based Alias Analysis (TBAA).
   ///
@@ -145,10 +148,12 @@ public enum Pass {
   /// in the source language(s).
   ///
   /// To construct this metadata, see `MDBuilder`.
-  case typeBasedAliasAnalysis
+  @available(*, deprecated, message: "Use pass names from LLVM's new Pass Manager.")
+  public static let typeBasedAliasAnalysis = Pass("")
   /// Adds metadata to LLVM IR types and performs metadata-based scoped no-alias
   /// analysis.
-  case scopedNoAliasAA
+  @available(*, deprecated, message: "Use pass names from LLVM's new Pass Manager.")
+  public static let scopedNoAliasAA = Pass("")
   /// LLVM's primary stateless and local alias analysis.
   ///
   /// Given a pointer value, walk the use-def chain to find out how that
@@ -166,115 +171,108 @@ public enum Pass {
   /// For example, loads through two members of a union with distinct types are
   /// declared by TBAA to be `noalias`, where BasicAA considers them
   /// `mustalias`.
-  case basicAliasAnalysis
+  @available(*, deprecated, message: "Use pass names from LLVM's new Pass Manager.")
+  public static let basicAliasAnalysis = Pass("")
   /// Performs alias and mod/ref analysis for internal global values that
   /// do not have their address taken.
   ///
   /// Internal global variables that are only loaded from may be marked as
   /// constants.
-  case globalsAliasAnalysis
+  @available(*, deprecated, message: "Use pass names from LLVM's new Pass Manager.")
+  public static let globalsAliasAnalysis = Pass("")
   /// This pass is used to ensure that functions have at most one return
   /// instruction in them.  Additionally, it keeps track of which node is
   /// the new exit node of the CFG.
-  case unifyFunctionExitNodes
+  @available(*, deprecated, message: "Use pass names from LLVM's new Pass Manager.")
+  public static let unifyFunctionExitNodes = Pass("")
   /// Runs the LLVM IR Verifier to sanity check the results of passes.
-  case verifier
+  @available(*, deprecated, message: "Use pass names from LLVM's new Pass Manager.")
+  public static let verifier = Pass("")
   /// A pass to inline and remove functions marked as "always_inline".
-  case alwaysInliner
+  @available(*, deprecated, message: "Use pass names from LLVM's new Pass Manager.")
+  public static let alwaysInliner = Pass("")
   /// This pass promotes "by reference" arguments to be passed by value if the
   /// number of elements passed is less than or equal to 3.
-  case argumentPromotion
+  @available(*, deprecated, message: "Use pass names from LLVM's new Pass Manager.")
+  public static let argumentPromotion = Pass("")
   /// This function returns a new pass that merges duplicate global constants
   /// together into a single constant that is shared. This is useful because
   /// some passes (ie TraceValues) insert a lot of string constants into the
   /// program, regardless of whether or not they duplicate an existing string.
-  case constantMerge
+  @available(*, deprecated, message: "Use pass names from LLVM's new Pass Manager.")
+  public static let constantMerge = Pass("")
   /// This pass removes arguments from functions which are not used by the body
   /// of the function.
-  case deadArgElimination
+  @available(*, deprecated, message: "Use pass names from LLVM's new Pass Manager.")
+  public static let deadArgElimination = Pass("")
   /// This pass walks SCCs of the call graph in RPO to deduce and propagate
   /// function attributes. Currently it only handles synthesizing `norecurse`
   /// attributes.
-  case functionAttrs
+  @available(*, deprecated, message: "Use pass names from LLVM's new Pass Manager.")
+  public static let functionAttrs = Pass("")
   /// Uses a heuristic to inline direct function calls to small functions.
-  case functionInlining
+  @available(*, deprecated, message: "Use pass names from LLVM's new Pass Manager.")
+  public static let functionInlining = Pass("")
   /// This transform is designed to eliminate unreachable internal globals
   /// (functions or global variables)
-  case globalDCE
+  @available(*, deprecated, message: "Use pass names from LLVM's new Pass Manager.")
+  public static let globalDCE = Pass("")
   /// This function returns a new pass that optimizes non-address taken internal
   /// globals.
-  case globalOptimizer
+  @available(*, deprecated, message: "Use pass names from LLVM's new Pass Manager.")
+  public static let globalOptimizer = Pass("")
   /// This pass propagates constants from call sites into the bodies of
   /// functions.
-  case ipConstantPropagation
+  @available(*, deprecated, message: "Use pass names from LLVM's new Pass Manager.")
+  public static let ipConstantPropagation = Pass("")
   /// This pass propagates constants from call sites into the bodies of
   /// functions, and keeps track of whether basic blocks are executable in the
   /// process.
-  case ipscc
+  @available(*, deprecated, message: "Use pass names from LLVM's new Pass Manager.")
+  public static let ipscc = Pass("")
   /// Return a new pass object which transforms invoke instructions into calls,
   /// if the callee can *not* unwind the stack.
-  case pruneEH
+  @available(*, deprecated, message: "Use pass names from LLVM's new Pass Manager.")
+  public static let pruneEH = Pass("")
   /// This transformation attempts to discovery `alloca` allocations of aggregates that can be
-  /// broken down into component scalar values.  
-  case scalarReplacementOfAggregates
+  /// broken down into component scalar values.
+  @available(*, deprecated, message: "Use pass names from LLVM's new Pass Manager.")
+  public static let scalarReplacementOfAggregates = Pass("")
   /// This pass removes any function declarations (prototypes) that are not used.
-  case stripDeadPrototypes
+  @available(*, deprecated, message: "Use pass names from LLVM's new Pass Manager.")
+  public static let stripDeadPrototypes = Pass("")
   /// These functions removes symbols from functions and modules without
   /// touching symbols for debugging information.
-  case stripSymbols
+  @available(*, deprecated, message: "Use pass names from LLVM's new Pass Manager.")
+  public static let stripSymbols = Pass("")
   /// Performs a loop vectorization pass to widen instructions in loops to
   /// operate on multiple consecutive iterations.
-  case loopVectorize
+  @available(*, deprecated, message: "Use pass names from LLVM's new Pass Manager.")
+  public static let loopVectorize = Pass("")
   /// This pass performs a superword-level parallelism pass to combine
   /// similar independent instructions into vector instructions.
-  case slpVectorize
+  @available(*, deprecated, message: "Use pass names from LLVM's new Pass Manager.")
+  public static let slpVectorize = Pass("")
   /// An invalid pass that crashes when added to the pass manager.
-  case invalid(reason: String)
-}
-
-extension Pass {
-  @available(*, deprecated, message: "Pass has been removed")
-  static let simplifyLibCalls: Pass = .invalid(reason: "Pass has been removed")
-  @available(*, deprecated, message: "Use the scalarReplacementOfAggregates instead")
-  static let scalarReplAggregates: Pass = .invalid(reason: "Pass has been renamed to 'scalarReplacementOfAggregates'")
-  @available(*, deprecated, message: "Use the scalarReplacementOfAggregates instead")
-  static let scalarReplAggregatesSSA: Pass = .invalid(reason: "Pass has been renamed to 'scalarReplacementOfAggregates'")
-}
-
-/// A `FunctionPassManager` is an object that collects a sequence of passes
-/// which run over a particular IR construct, and runs each of them in sequence
-/// over each such construct.
-@available(*, deprecated, message: "Use the PassPipeliner instead")
-public class FunctionPassManager {
-  internal let llvm: LLVMPassManagerRef
-  var alivePassObjects = [Any]()
-
-  /// Creates a `FunctionPassManager` bound to the given module's IR.
-  public init(module: Module) {
-    llvm = LLVMCreateFunctionPassManagerForModule(module.llvm)!
-    LLVMInitializeFunctionPassManager(llvm)
-  }
-
-  /// Adds the given passes to the pass manager.
+  @available(*, deprecated, message: "Use pass names from LLVM's new Pass Manager.")
+  public static func invalid(reason: String) -> Pass { Pass("") }
+  
+  // TODO: Figure if these can be updated these to LLVM 18
+  /// Working in conjunction with the linker, iterate through all functions and
+  /// global values in the module and attempt to change their linkage from
+  /// external to internal.
   ///
-  /// - parameter passes: A list of function passes to add to the pass manager's
-  ///   list of passes to run.
-  public func add(_ passes: Pass...) {
-    for pass in passes {
-      PassPipeliner.configurePass(pass, passManager: llvm, keepalive: &alivePassObjects)
-    }
-  }
-
-  /// Runs all listed functions in the pass manager on the given function.
+  /// To preserve the linkage of a global value, return `true` from the given
+  /// callback.
+  @available(*, deprecated)
+  public static func internalize(mustPreserve: (IRGlobal) -> Bool) -> Pass { Pass("") }
+  /// Working in conjunction with the linker, iterate through all functions and
+  /// global values in the module and attempt to change their linkage from
+  /// external to internal.
   ///
-  /// - parameter function: The function to run listed passes on.
-  public func run(on function: Function) {
-    LLVMRunFunctionPassManager(llvm, function.asLLVM())
-  }
+  /// When a function with the name "main" is encountered, if the value of
+  /// `preserveMain` is `true`, "main" will not be internalized.
+  @available(*, deprecated)
+  public static func internalizeAll(preserveMain: Bool) -> Pass { Pass("") }
+  
 }
-
-/// A subset of supported LLVM IR optimizer passes.
-@available(*, deprecated, renamed: "Pass")
-public typealias FunctionPass = Pass
-
-*/
