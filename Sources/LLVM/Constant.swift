@@ -628,3 +628,585 @@ extension Constant where Repr == Vector {
     return Constant(llvm: ty.undef().asLLVM())
   }
 }
+
+
+
+
+
+// MARK: Removed Functions
+// These are still around to help with error messages
+
+// MARK: Casts
+
+extension Constant {
+
+  /// This method has been removed because the corresponding C function
+  /// has been removed from LLVM.
+  ///
+  /// Please use `IRBuilder.buildCast(_:value:type:name:)`
+  /// instead, which will likely be folded to a constant.
+  @available(*, deprecated, message: "Use IRBuilder.buildCast(_:value:type:name:) instead.")
+  public func cast(to type: IntType) -> Never {
+    fatalError("Attempted to call Constant.cast(to:), use IRBuilder.buildCast(_:value:type:name:) instead.")
+  }
+
+  /// This method has been removed because the corresponding C function
+  /// has been removed from LLVM.
+  ///
+  /// Please use `IRBuilder.buildCast(_:value:type:name:)`
+  /// instead, which will likely be folded to a constant.
+  @available(*, deprecated, message: "Use IRBuilder.buildCast(_:value:type:name:) instead.")
+  public func cast(to type: FloatType) -> Never {
+    fatalError("Attempted to call Constant.cast(to:), use IRBuilder.buildCast(_:value:type:name:) instead.")
+  }
+  
+}
+
+// MARK: Truncation
+
+extension Constant where Repr == Floating {
+  
+  /// This method has been removed because the corresponding C function
+  /// has been removed from LLVM.
+  ///
+  /// Please use `IRBuilder.buildTrunc(_:type:name:)`
+  /// instead, which will likely be folded to a constant.
+  ///
+  /// Note the integer version of this API is still supported.
+  @available(*, deprecated, message: "Use IRBuilder.buildTrunc(_:type:name:) instead.")
+  public func truncate(to type: IntType) -> Never {
+    fatalError("Attempted to call Constant.truncate(to:) on a float, use IRBuilder.buildTrunc(_:type:name:) instead.")
+  }
+  
+  /// This method has been removed because the corresponding C function
+  /// has been removed from LLVM.
+  ///
+  /// Please use `IRBuilder.buildTrunc(_:type:name:)`
+  /// instead, which will likely be folded to a constant.
+  ///
+  /// Note the integer version of this API is still supported.
+  @available(*, deprecated, message: "Use IRBuilder.buildTrunc(_:type:name:) instead.")
+  public func truncate(to type: FloatType) -> Never {
+    fatalError("Attempted to call Constant.truncate(to:) on a float, use IRBuilder.buildTrunc(_:type:name:) instead.")
+  }
+
+  /// This method has been removed because the corresponding C function
+  /// has been removed from LLVM.
+  @available(*, deprecated, message: "Use IRBuilder instead.")
+  public func extend(to type: FloatType) -> Never {
+    fatalError("Attempted to call Constant.extend(to:), use IRBuilder instead.")
+  }
+  
+}
+
+// MARK: Arithmetic Operations
+
+// MARK: Negation
+
+extension Constant {
+
+  /// This method has been removed because the corresponding C function
+  /// has been removed from LLVM.
+  ///
+  /// Please use `IRBuilder.buildNeg(_:overflowBehavior:name:)`
+  /// instead, which will likely be folded to a constant.
+  ///
+  /// Note the integer version of this API is still supported.
+  @available(*, deprecated, message: "Use IRBuilder.buildNeg(_:overflowBehavior:name:) instead.")
+  public static func negate(_ lhs: Constant<Floating>) -> Never {
+    fatalError("Attempted to call Constant.negate(to:) on a float, use IRBuilder.buildNeg(_:overflowBehavior:name:) instead.")
+  }
+  
+}
+
+extension Constant where Repr == Floating {
+
+  /// This method has been removed because the corresponding C function
+  /// has been removed from LLVM.
+  ///
+  /// Please use `IRBuilder.buildNeg(_:overflowBehavior:name:)`
+  /// instead, which will likely be folded to a constant.
+  ///
+  /// Note the integer version of this API is still supported.
+  @available(*, deprecated, message: "Use IRBuilder.buildNeg(_:overflowBehavior:name:) instead.")
+  public func negate() -> Never {
+    fatalError("Attempted to call Constant.negate() on a float, use IRBuilder.buildNeg(_:overflowBehavior:name:) instead.")
+  }
+  
+}
+
+// MARK: Addition
+
+extension Constant {
+
+  /// This method has been removed because the corresponding C function
+  /// has been removed from LLVM.
+  ///
+  /// Please use `IRBuilder.buildAdd(_:_:overflowBehavior:name:)`
+  /// instead, which will likely be folded to a constant.
+  ///
+  /// Note the integer version of this API is still supported.
+  @available(*, deprecated, message: "Use IRBuilder.buildAdd(_:_:overflowBehavior:name:) instead.")
+  public static func add(_ lhs: Constant<Floating>, _ rhs: Constant<Floating>) -> Never {
+    fatalError("Attempted to call Constant.add(_:_:) with floats, use IRBuilder.buildAdd(_:_:overflowBehavior:name:) instead.")
+  }
+  
+}
+
+extension Constant where Repr == Floating {
+
+  /// This method has been removed because the corresponding C function
+  /// has been removed from LLVM.
+  ///
+  /// Please use `IRBuilder.buildAdd(_:_:overflowBehavior:name:)`
+  /// instead, which will likely be folded to a constant.
+  ///
+  /// Note the integer version of this API is still supported.
+  @available(*, deprecated, message: "Use IRBuilder.buildAdd(_:_:overflowBehavior:name:) instead.")
+  public func adding(_ rhs: Constant) -> Never {
+    fatalError("Attempted to call Constant.adding(_:) on a float, use IRBuilder.buildAdd(_:_:overflowBehavior:name:) instead.")
+  }
+  
+}
+
+// MARK: Subtraction
+
+extension Constant {
+
+  /// This method has been removed because the corresponding C function
+  /// has been removed from LLVM.
+  ///
+  /// Please use `IRBuilder.buildSub(_:_:overflowBehavior:name:)`
+  /// instead, which will likely be folded to a constant.
+  ///
+  /// Note the integer version of this API is still supported.
+  @available(*, deprecated, message: "Use IRBuilder.buildSub(_:_:overflowBehavior:name:) instead.")
+  public static func subtract(_ lhs: Constant<Floating>, _ rhs: Constant<Floating>) -> Never {
+    fatalError("Attempted to call Constant.subtract(_:_:) with floats, use IRBuilder.buildSub(_:_:overflowBehavior:name:) instead.")
+  }
+  
+}
+
+extension Constant where Repr == Floating {
+  
+  /// This method has been removed because the corresponding C function
+  /// has been removed from LLVM.
+  ///
+  /// Please use `IRBuilder.buildSub(_:_:overflowBehavior:name:)`
+  /// instead, which will likely be folded to a constant.
+  ///
+  /// Note the integer version of this API is still supported.
+  @available(*, deprecated, message: "Use IRBuilder.buildSub(_:_:overflowBehavior:name:) instead.")
+  public static func subtracting(_ rhs: Constant) -> Never {
+    fatalError("Attempted to call Constant.subtracting(_:) on a float, use IRBuilder.buildSub(_:_:overflowBehavior:name:) instead.")
+  }
+  
+}
+
+// MARK: Multiplication
+
+extension Constant {
+
+  /// This method has been removed because the corresponding C function
+  /// has been removed from LLVM.
+  ///
+  /// Please use `IRBuilder.buildMul(_:_:overflowBehavior:name:)`
+  /// instead, which will likely be folded to a constant.
+  ///
+  /// Note the integer version of this API is still supported.
+  @available(*, deprecated, message: "Use IRBuilder.buildMul(_:_:overflowBehavior:name:) instead.")
+  public static func multiply(_ lhs: Constant<Floating>, _ rhs: Constant<Floating>) -> Never {
+    fatalError("Attempted to call Constant.multiply(_:_:) with floats, use IRBuilder.buildMul(_:_:overflowBehavior:name:) instead.")
+  }
+  
+}
+
+extension Constant where Repr == Floating {
+  
+  /// This method has been removed because the corresponding C function
+  /// has been removed from LLVM.
+  ///
+  /// Please use `IRBuilder.buildMul(_:_:overflowBehavior:name:)`
+  /// instead, which will likely be folded to a constant.
+  ///
+  /// Note the integer version of this API is still supported.
+  @available(*, deprecated, message: "Use IRBuilder.buildMul(_:_:overflowBehavior:name:) instead.")
+  public static func multiplying(_ rhs: Constant) -> Never {
+    fatalError("Attempted to call Constant.multiplying(_:) on a float, use IRBuilder.buildMul(_:_:overflowBehavior:name:) instead.")
+  }
+  
+}
+
+// MARK: Divide
+
+extension Constant {
+
+  /// This method has been removed because the corresponding C function
+  /// has been removed from LLVM.
+  ///
+  /// Please use `IRBuilder.buildDiv(_:_:signed:exact:name:)`
+  /// instead, which will likely be folded to a constant.
+  @available(*, deprecated, message: "Use IRBuilder.buildDiv(_:_:signed:exact:name:) instead.")
+  public static func divide(_ lhs: Constant<Unsigned>, _ rhs: Constant<Unsigned>) -> Never {
+    fatalError("Attempted to call Constant.divide(_:_:), use IRBuilder.buildDiv(_:_:signed:exact:name:) instead.")
+  }
+
+  /// This method has been removed because the corresponding C function
+  /// has been removed from LLVM.
+  ///
+  /// Please use `IRBuilder.buildDiv(_:_:signed:exact:name:)`
+  /// instead, which will likely be folded to a constant.
+  @available(*, deprecated, message: "Use IRBuilder.buildDiv(_:_:signed:exact:name:) instead.")
+  public static func divide(_ lhs: Constant<Signed>, _ rhs: Constant<Signed>) -> Never {
+    fatalError("Attempted to call Constant.divide(_:_:), use IRBuilder.buildDiv(_:_:signed:exact:name:) instead.")
+  }
+
+  /// This method has been removed because the corresponding C function
+  /// has been removed from LLVM.
+  ///
+  /// Please use `IRBuilder.buildDiv(_:_:signed:exact:name:)`
+  /// instead, which will likely be folded to a constant.
+  @available(*, deprecated, message: "Use IRBuilder.buildDiv(_:_:signed:exact:name:) instead.")
+  public static func divide(_ lhs: Constant<Floating>, _ rhs: Constant<Floating>) -> Never {
+    fatalError("Attempted to call Constant.divide(_:_:), use IRBuilder.buildDiv(_:_:signed:exact:name:) instead.")
+  }
+  
+}
+
+extension Constant {
+
+  /// This method has been removed because the corresponding C function
+  /// has been removed from LLVM.
+  ///
+  /// Please use `IRBuilder.buildDiv(_:_:signed:exact:name:)`
+  /// instead, which will likely be folded to a constant.
+  @available(*, deprecated, message: "Use IRBuilder.buildDiv(_:_:signed:exact:name:) instead.")
+  public func dividing(by rhs: Constant) -> Never {
+    fatalError("Attempted to call Constant.dividing(_:), use IRBuilder.buildDiv(_:_:signed:exact:name:) instead.")
+  }
+  
+}
+
+// MARK: Remainder
+
+extension Constant {
+
+  /// This method has been removed because the corresponding C function
+  /// has been removed from LLVM.
+  ///
+  /// Please use `IRBuilder.buildRem(_:_:signed:name:)`
+  /// instead, which will likely be folded to a constant.
+  @available(*, deprecated, message: "Use IRBuilder.buildRem(_:_:signed:name:) instead.")
+  public static func remainder(_ lhs: Constant<Signed>, _ rhs: Constant<Signed>) -> Never {
+    fatalError("Attempted to call Constant.remainder(_:_:), use IRBuilder.buildRem(_:_:signed:name:) instead.")
+  }
+
+  /// This method has been removed because the corresponding C function
+  /// has been removed from LLVM.
+  ///
+  /// Please use `IRBuilder.buildRem(_:_:signed:name:)`
+  /// instead, which will likely be folded to a constant.
+  @available(*, deprecated, message: "Use IRBuilder.buildRem(_:_:signed:name:) instead.")
+  public static func remainder(_ lhs: Constant<Unsigned>, _ rhs: Constant<Unsigned>) -> Never {
+    fatalError("Attempted to call Constant.remainder(_:_:), use IRBuilder.buildRem(_:_:signed:name:) instead.")
+  }
+
+  /// This method has been removed because the corresponding C function
+  /// has been removed from LLVM.
+  ///
+  /// Please use `IRBuilder.buildRem(_:_:signed:name:)`
+  /// instead, which will likely be folded to a constant.
+  @available(*, deprecated, message: "Use IRBuilder.buildRem(_:_:signed:name:) instead.")
+  public static func remainder(_ lhs: Constant<Floating>, _ rhs: Constant<Floating>) -> Never {
+    fatalError("Attempted to call Constant.remainder(_:_:), use IRBuilder.buildRem(_:_:signed:name:) instead.")
+  }
+  
+}
+
+extension Constant {
+  
+  /// This method has been removed because the corresponding C function
+  /// has been removed from LLVM.
+  ///
+  /// Please use `IRBuilder.buildRem(_:_:signed:name:)`
+  /// instead, which will likely be folded to a constant.
+  @available(*, deprecated, message: "Use IRBuilder.buildRem(_:_:signed:name:) instead.")
+  public func remainder(by rhs: Constant) -> Never {
+    fatalError("Attempted to call Constant.remainder(_:), use IRBuilder.buildRem(_:_:signed:name:) instead.")
+  }
+  
+}
+
+// MARK: Logical Operations
+
+extension Constant {
+
+  /// This method has been removed because the corresponding C function
+  /// has been removed from LLVM.
+  ///
+  /// Please use `IRBuilder.buildAnd(_:_:)`
+  /// instead, which will likely be folded to a constant.
+  @available(*, deprecated, message: "Use IRBuilder.buildAnd(_:_:) instead.")
+  public static func and<T: IntegralConstantRepresentation>(_ lhs: Constant<T>, _ rhs: Constant<T>) -> Never {
+    fatalError("Attempted to call Constant.and(_:_:), use IRBuilder.buildAnd(_:_:) instead.")
+  }
+
+  /// This method has been removed because the corresponding C function
+  /// has been removed from LLVM.
+  ///
+  /// Please use `IRBuilder.buildOr(_:_:name:)`
+  /// instead, which will likely be folded to a constant.
+  @available(*, deprecated, message: "Use IRBuilder.buildOr(_:_:name:) instead.")
+  public static func or<T: IntegralConstantRepresentation>(_ lhs: Constant<T>, _ rhs: Constant<T>) -> Never {
+    fatalError("Attempted to call Constant.and(_:_:), use IRBuilder.buildOr(_:_:name:) instead.")
+  }
+
+  /// This method has been removed because the corresponding C function
+  /// has been removed from LLVM.
+  ///
+  /// Please use `IRBuilder.buildXor(_:_:)`
+  /// instead, which will likely be folded to a constant.
+  @available(*, deprecated, message: "Use IRBuilder.buildXor(_:_:) instead.")
+  public static func xor<T: IntegralConstantRepresentation>(_ lhs: Constant<T>, _ rhs: Constant<T>) -> Never {
+    fatalError("Attempted to call Constant.and(_:_:), use IRBuilder.buildXor(_:_:) instead.")
+  }
+  
+  // MARK: Bitshifting Operations
+
+  /// This method has been removed because the corresponding C function
+  /// has been removed from LLVM.
+  ///
+  /// Please use `IRBuilder.buildShr(_:_:)`
+  /// instead, which will likely be folded to a constant.
+  @available(*, deprecated, message: "Use IRBuilder.buildShr(_:_:) instead.")
+  public static func rightShift<T: IntegralConstantRepresentation>(_ lhs: Constant<T>, _ rhs: Constant<T>, arithmetic: Bool = true) -> Never {
+    fatalError("Attempted to call Constant.rightShift(_:_:), use IRBuilder.buildShr(_:_:) instead.")
+  }
+
+  // MARK: Conditional Operations
+
+  /// This method has been removed because the corresponding C function
+  /// has been removed from LLVM.
+  ///
+  /// Please use `IRBuilder.buildSelect(_:then:else:name:)`
+  /// instead, which will likely be folded to a constant.
+  @available(*, deprecated, message: "Use IRBuilder.buildSelect(_:then:else:name:) instead.")
+  public static func select<T: IntegralConstantRepresentation, U>(_ cond: Constant<T>, then: Constant<U>, else: Constant<U>) -> Never {
+    fatalError("Attempted to call Constant.select(_:then:else:), use IRBuilder.buildSelect(_:then:else:name:) instead.")
+  }
+  
+}
+
+// MARK: Struct Operations
+
+extension Constant where Repr == Struct {
+
+  /// This method has been removed because the corresponding C function
+  /// has been removed from LLVM.
+  ///
+  /// Please use `IRBuilder.buildExtractValue(_:index:name:)`
+  /// instead, which will likely be folded to a constant.
+  @available(*, deprecated, message: "Use IRBuilder.buildExtractValue(_:index:name:) instead.")
+  public func getElement(indices: [Int]) -> Never {
+    fatalError("Attempted to call Constant.getElement(indices:), use IRBuilder.buildSelect(_:index:name:) instead.")
+  }
+
+  /// This method has been removed because the corresponding C function
+  /// has been removed from LLVM.
+  ///
+  /// Please use `IRBuilder.buildGEP(_:type:indicies:name:)`
+  /// instead, which will likely be folded to a constant.
+  @available(*, deprecated, message: "Use IRBuilder.buildGEP(_:type:indicies:name:) instead.")
+  public func getElementPointer(indices: [IRConstant]) -> IRConstant {
+    fatalError("Attempted to call Constant.getElementPointer(indices:), use IRBuilder.buildGEP(_:type:indicies:name:) instead.")
+  }
+
+  /// This method has been removed because the corresponding C function
+  /// has been removed from LLVM.
+  ///
+  /// Please use `IRBuilder.buildInBoundsGEP(_:type:indicies:name:)`
+  /// instead, which will likely be folded to a constant.
+  @available(*, deprecated, message: "Use IRBuilder.buildInBoundsGEP(_:type:indicies:name:) instead.")
+  public func inBoundsGetElementPointer(indices: [IRConstant]) -> IRConstant {
+    fatalError("Attempted to call Constant.getElementPointer(indices:), use IRBuilder.buildInBoundsGEP(_:type:indicies:name:) instead.")
+  }
+  
+}
+
+// MARK: Swift Operators
+
+extension Constant where Repr == Floating {
+  
+  /// This method has been removed because the corresponding C function
+  /// has been removed from LLVM.
+  ///
+  /// Please use `IRBuilder.buildAdd(_:_:overflowBehavior:name:)`
+  /// instead, which will likely be folded to a constant.
+  @available(*, deprecated, message: "Use IRBuilder.buildAdd(_:_:overflowBehavior:name:) instead.")
+  public static func + (lhs: Constant, rhs: Constant) -> Never {
+    fatalError("Attempted to call Constant's `+` operator, use IRBuilder.buildAdd(_:_:overflowBehavior:name:) instead.")
+  }
+  
+  /// This method has been removed because the corresponding C function
+  /// has been removed from LLVM.
+  ///
+  /// Please use `IRBuilder.buildSub(_:_:overflowBehavior:name:)`
+  /// instead, which will likely be folded to a constant.
+  @available(*, deprecated, message: "Use IRBuilder.buildSub(_:_:overflowBehavior:name:) instead.")
+  public static func - (lhs: Constant, rhs: Constant) -> Never {
+    fatalError("Attempted to call Constant's `-` operator, use IRBuilder.buildSub(_:_:overflowBehavior:name:) instead.")
+  }
+  
+  /// This method has been removed because the corresponding C function
+  /// has been removed from LLVM.
+  ///
+  /// Please use `IRBuilder.buildMul(_:_:overflowBehavior:name:)`
+  /// instead, which will likely be folded to a constant.
+  @available(*, deprecated, message: "Use IRBuilder.buildMul(_:_:overflowBehavior:name:) instead.")
+  public static func * (lhs: Constant, rhs: Constant) -> Never {
+    fatalError("Attempted to call Constant's `*` operator, use IRBuilder.buildMul(_:_:overflowBehavior:name:) instead.")
+  }
+  
+  /// This method has been removed because the corresponding C function
+  /// has been removed from LLVM.
+  ///
+  /// Please use `IRBuilder.buildICmp(_:_:predicate::name:)`
+  /// instead, which will likely be folded to a constant.
+  @available(*, deprecated, message: "Use IRBuilder.buildICmp(_:_:predicate::name:) instead.")
+  public static func == (lhs: Constant, rhs: Constant) -> Never {
+    fatalError("Attempted to call Constant's `==` operator, use IRBuilder.buildICmp(_:_:predicate::name:) instead.")
+  }
+
+  /// This method has been removed because the corresponding C function
+  /// has been removed from LLVM.
+  ///
+  /// Please use `IRBuilder.buildICmp(_:_:predicate::name:)`
+  /// instead, which will likely be folded to a constant.
+  @available(*, deprecated, message: "Use IRBuilder.buildICmp(_:_:predicate::name:) instead.")
+  public static func < (lhs: Constant, rhs: Constant) -> Never {
+    fatalError("Attempted to call Constant's `<` operator, use IRBuilder.buildICmp(_:_:predicate::name:) instead.")
+  }
+
+  /// This method has been removed because the corresponding C function
+  /// has been removed from LLVM.
+  ///
+  /// Please use `IRBuilder.buildICmp(_:_:predicate::name:)`
+  /// instead, which will likely be folded to a constant.
+  @available(*, deprecated, message: "Use IRBuilder.buildICmp(_:_:predicate::name:) instead.")
+  public static func > (lhs: Constant, rhs: Constant) -> Never {
+    fatalError("Attempted to call Constant's `>` operator, use IRBuilder.buildICmp(_:_:predicate::name:) instead.")
+  }
+
+  /// This method has been removed because the corresponding C function
+  /// has been removed from LLVM.
+  ///
+  /// Please use `IRBuilder.buildICmp(_:_:predicate::name:)`
+  /// instead, which will likely be folded to a constant.
+  @available(*, deprecated, message: "Use IRBuilder.buildICmp(_:_:predicate::name:) instead.")
+  public static func <= (lhs: Constant, rhs: Constant) -> Never {
+    fatalError("Attempted to call Constant's `<=` operator, use IRBuilder.buildICmp(_:_:predicate::name:) instead.")
+  }
+
+  /// This method has been removed because the corresponding C function
+  /// has been removed from LLVM.
+  ///
+  /// Please use `IRBuilder.buildICmp(_:_:predicate::name:)`
+  /// instead, which will likely be folded to a constant.
+  @available(*, deprecated, message: "Use IRBuilder.buildICmp(_:_:predicate::name:) instead.")
+  public static func >= (lhs: Constant, rhs: Constant) -> Never {
+    fatalError("Attempted to call Constant's `==` operator, use IRBuilder.buildICmp(_:_:predicate::name:) instead.")
+  }
+  
+}
+
+extension Constant {
+
+  /// This method has been removed because the corresponding C function
+  /// has been removed from LLVM.
+  ///
+  /// Please use `IRBuilder.buildDiv(_:_:signed:exact:name:)`
+  /// instead, which will likely be folded to a constant.
+  @available(*, deprecated, message: "Use IRBuilder.buildDiv(_:_:signed:exact:name:) instead.")
+  public static func / (lhs: Constant, rhs: Constant) -> Never {
+    fatalError("Attempted to call Constant's `/` operator, use IRBuilder.buildDiv(_:_:signed:exact:name:) instead.")
+  }
+
+  /// This method has been removed because the corresponding C function
+  /// has been removed from LLVM.
+  ///
+  /// Please use `IRBuilder.buildRem(_:_:signed:name:)`
+  /// instead, which will likely be folded to a constant.
+  @available(*, deprecated, message: "Use IRBuilder.buildRem(_:_:signed:name:) instead.")
+  public static func % (lhs: Constant, rhs: Constant) -> Never {
+    fatalError("Attempted to call Constant's `%` operator, use IRBuilder.buildRem(_:_:signed:name:) instead.")
+  }
+
+}
+
+extension Constant where Repr == Signed {
+  
+  /// This method has been removed because the corresponding C function
+  /// has been removed from LLVM.
+  ///
+  /// Please use `IRBuilder.buildOr(_:_:name:)`
+  /// instead, which will likely be folded to a constant.
+  @available(*, deprecated, message: "Use IRBuilder.buildOr(_:_:name:) instead.")
+  public static func | (lhs: Constant, rhs: Constant) -> Never {
+    fatalError("Attempted to call Constant's `|` operator, use IRBuilder.buildOr(_:_:name:) instead.")
+  }
+
+  /// This method has been removed because the corresponding C function
+  /// has been removed from LLVM.
+  ///
+  /// Please use `IRBuilder.buildAnd(_:_:name:)`
+  /// instead, which will likely be folded to a constant.
+  @available(*, deprecated, message: "Use IRBuilder.buildAnd(_:_:name:) instead.")
+  public static func & (lhs: Constant, rhs: Constant) -> Never {
+    fatalError("Attempted to call Constant's `&` operator, use IRBuilder.buildAnd(_:_:name:) instead.")
+  }
+  
+  /// This method has been removed because the corresponding C function
+  /// has been removed from LLVM.
+  ///
+  /// Please use `IRBuilder.buildShr(_:_:isArithmetic:name:)`
+  /// instead, which will likely be folded to a constant.
+  @available(*, deprecated, message: "Use IRBuilder.buildShr(_:_:isArithmetic:name:) instead.")
+  public static func >> (lhs: Constant, rhs: Constant) -> Never {
+    fatalError("Attempted to call Constant's `>>` operator, use IRBuilder.buildShr(_:_:isArithmetic:name:) instead.")
+  }
+  
+}
+
+extension Constant where Repr == Unsigned {
+  
+  /// This method has been removed because the corresponding C function
+  /// has been removed from LLVM.
+  ///
+  /// Please use `IRBuilder.buildOr(_:_:name:)`
+  /// instead, which will likely be folded to a constant.
+  @available(*, deprecated, message: "Use IRBuilder.buildOr(_:_:name:) instead.")
+  public static func | (lhs: Constant, rhs: Constant) -> Never {
+    fatalError("Attempted to call Constant's `|` operator, use IRBuilder.buildOr(_:_:name:) instead.")
+  }
+
+  /// This method has been removed because the corresponding C function
+  /// has been removed from LLVM.
+  ///
+  /// Please use `IRBuilder.buildAnd(_:_:name:)`
+  /// instead, which will likely be folded to a constant.
+  @available(*, deprecated, message: "Use IRBuilder.buildAnd(_:_:name:) instead.")
+  public static func & (lhs: Constant, rhs: Constant) -> Never {
+    fatalError("Attempted to call Constant's `&` operator, use IRBuilder.buildAnd(_:_:name:) instead.")
+  }
+  
+  /// This method has been removed because the corresponding C function
+  /// has been removed from LLVM.
+  ///
+  /// Please use `IRBuilder.buildShr(_:_:isArithmetic:name:)`
+  /// instead, which will likely be folded to a constant.
+  @available(*, deprecated, message: "Use IRBuilder.buildShr(_:_:isArithmetic:name:) instead.")
+  public static func >> (lhs: Constant, rhs: Constant) -> Never {
+    fatalError("Attempted to call Constant's `>>` operator, use IRBuilder.buildShr(_:_:isArithmetic:name:) instead.")
+  }
+  
+}
