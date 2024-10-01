@@ -344,6 +344,175 @@ extension Constant where Repr == Unsigned {
   }
 }
 
+// MARK: Comparison Operations
+
+extension Constant where Repr: IntegralConstantRepresentation {
+
+  /// A constant equality comparison between two values.
+  ///
+  /// - parameter lhs: The first value to compare.
+  /// - parameter rhs: The second value to compare.
+  ///
+  /// - returns: A constant integral value (i1) representing the result of the
+  ///   comparision of the given operands.
+  public static func equals(_ lhs: Constant, _ rhs: Constant) -> Constant<Signed> {
+    return Constant<Signed>(llvm: LLVMConstICmp(IntPredicate.equal.llvm, lhs.llvm, rhs.llvm))
+  }
+}
+
+extension Constant where Repr == Signed {
+
+  /// A constant less-than comparison between two values.
+  ///
+  /// - parameter lhs: The first value to compare.
+  /// - parameter rhs: The second value to compare.
+  ///
+  /// - returns: A constant integral value (i1) representing the result of the
+  ///   comparision of the given operands.
+  public static func lessThan(_ lhs: Constant, _ rhs: Constant) -> Constant<Signed> {
+    return Constant<Signed>(llvm: LLVMConstICmp(IntPredicate.unsignedLessThan.llvm, lhs.llvm, rhs.llvm))
+  }
+
+  /// A constant greater-than comparison between two values.
+  ///
+  /// - parameter lhs: The first value to compare.
+  /// - parameter rhs: The second value to compare.
+  ///
+  /// - returns: A constant integral value (i1) representing the result of the
+  ///   comparision of the given operands.
+  public static func greaterThan(_ lhs: Constant, _ rhs: Constant) -> Constant<Signed> {
+    return Constant<Signed>(llvm: LLVMConstICmp(IntPredicate.signedGreaterThan.llvm, lhs.llvm, rhs.llvm))
+  }
+
+  /// A constant less-than-or-equal comparison between two values.
+  ///
+  /// - parameter lhs: The first value to compare.
+  /// - parameter rhs: The second value to compare.
+  ///
+  /// - returns: A constant integral value (i1) representing the result of the
+  ///   comparision of the given operands.
+  public static func lessThanOrEqual(_ lhs: Constant, _ rhs: Constant) -> Constant<Signed> {
+    return Constant<Signed>(llvm: LLVMConstICmp(IntPredicate.signedLessThanOrEqual.llvm, lhs.llvm, rhs.llvm))
+  }
+
+  /// A constant greater-than-or-equal comparison between two values.
+  ///
+  /// - parameter lhs: The first value to compare.
+  /// - parameter rhs: The second value to compare.
+  ///
+  /// - returns: A constant integral value (i1) representing the result of the
+  ///   comparision of the given operands.
+  public static func greaterThanOrEqual(_ lhs: Constant, _ rhs: Constant) -> Constant<Signed> {
+    return Constant<Signed>(llvm: LLVMConstICmp(IntPredicate.signedGreaterThanOrEqual.llvm, lhs.llvm, rhs.llvm))
+  }
+}
+
+extension Constant where Repr == Unsigned {
+
+  /// A constant less-than comparison between two values.
+  ///
+  /// - parameter lhs: The first value to compare.
+  /// - parameter rhs: The second value to compare.
+  ///
+  /// - returns: A constant integral value (i1) representing the result of the
+  ///   comparision of the given operands.
+  public static func lessThan(_ lhs: Constant, _ rhs: Constant) -> Constant<Signed> {
+    return Constant<Signed>(llvm: LLVMConstICmp(IntPredicate.unsignedLessThan.llvm, lhs.llvm, rhs.llvm))
+  }
+
+  /// A constant greater-than comparison between two values.
+  ///
+  /// - parameter lhs: The first value to compare.
+  /// - parameter rhs: The second value to compare.
+  ///
+  /// - returns: A constant integral value (i1) representing the result of the
+  ///   comparision of the given operands.
+  public static func greaterThan(_ lhs: Constant, _ rhs: Constant) -> Constant<Signed> {
+    return Constant<Signed>(llvm: LLVMConstICmp(IntPredicate.unsignedGreaterThan.llvm, lhs.llvm, rhs.llvm))
+  }
+
+  /// A constant less-than-or-equal comparison between two values.
+  ///
+  /// - parameter lhs: The first value to compare.
+  /// - parameter rhs: The second value to compare.
+  ///
+  /// - returns: A constant integral value (i1) representing the result of the
+  ///   comparision of the given operands.
+  public static func lessThanOrEqual(_ lhs: Constant, _ rhs: Constant) -> Constant<Signed> {
+    return Constant<Signed>(llvm: LLVMConstICmp(IntPredicate.unsignedLessThanOrEqual.llvm, lhs.llvm, rhs.llvm))
+  }
+
+  /// A constant greater-than-or-equal comparison between two values.
+  ///
+  /// - parameter lhs: The first value to compare.
+  /// - parameter rhs: The second value to compare.
+  ///
+  /// - returns: A constant integral value (i1) representing the result of the
+  ///   comparision of the given operands.
+  public static func greaterThanOrEqual(_ lhs: Constant, _ rhs: Constant) -> Constant<Signed> {
+    return Constant<Signed>(llvm: LLVMConstICmp(IntPredicate.unsignedGreaterThanOrEqual.llvm, lhs.llvm, rhs.llvm))
+  }
+}
+
+extension Constant where Repr == Floating {
+
+  /// A constant equality comparison between two values.
+  ///
+  /// - parameter lhs: The first value to compare.
+  /// - parameter rhs: The second value to compare.
+  ///
+  /// - returns: A constant integral value (i1) representing the result of the
+  ///   comparision of the given operands.
+  public static func equals(_ lhs: Constant, _ rhs: Constant) -> Constant<Signed> {
+    return Constant<Signed>(llvm: LLVMConstFCmp(RealPredicate.orderedEqual.llvm, lhs.llvm, rhs.llvm))
+  }
+
+  /// A constant less-than comparison between two values.
+  ///
+  /// - parameter lhs: The first value to compare.
+  /// - parameter rhs: The second value to compare.
+  ///
+  /// - returns: A constant integral value (i1) representing the result of the
+  ///   comparision of the given operands.
+  public static func lessThan(_ lhs: Constant, _ rhs: Constant) -> Constant<Signed> {
+    return Constant<Signed>(llvm: LLVMConstFCmp(RealPredicate.orderedLessThan.llvm, lhs.llvm, rhs.llvm))
+  }
+
+  /// A constant greater-than comparison between two values.
+  ///
+  /// - parameter lhs: The first value to compare.
+  /// - parameter rhs: The second value to compare.
+  ///
+  /// - returns: A constant integral value (i1) representing the result of the
+  ///   comparision of the given operands.
+  public static func greaterThan(_ lhs: Constant, _ rhs: Constant) -> Constant<Signed> {
+    return Constant<Signed>(llvm: LLVMConstFCmp(RealPredicate.orderedGreaterThan.llvm, lhs.llvm, rhs.llvm))
+  }
+
+  /// A constant less-than-or-equal comparison between two values.
+  ///
+  /// - parameter lhs: The first value to compare.
+  /// - parameter rhs: The second value to compare.
+  ///
+  /// - returns: A constant integral value (i1) representing the result of the
+  ///   comparision of the given operands.
+  public static func lessThanOrEqual(_ lhs: Constant, _ rhs: Constant) -> Constant<Signed> {
+    return Constant<Signed>(llvm: LLVMConstFCmp(RealPredicate.orderedLessThanOrEqual.llvm, lhs.llvm, rhs.llvm))
+  }
+
+  /// A constant greater-than-or-equal comparison between two values.
+  ///
+  /// - parameter lhs: The first value to compare.
+  /// - parameter rhs: The second value to compare.
+  ///
+  /// - returns: A constant integral value (i1) representing the result of the
+  ///   comparision of the given operands.
+  public static func greaterThanOrEqual(_ lhs: Constant, _ rhs: Constant) -> Constant<Signed> {
+    return Constant<Signed>(llvm: LLVMConstFCmp(RealPredicate.orderedGreaterThanOrEqual.llvm, lhs.llvm, rhs.llvm))
+  }
+}
+
+
 extension Constant where Repr == Signed {
 
   /// Creates a constant multiply operation with the given values as operands.
@@ -490,7 +659,7 @@ extension Constant where Repr == Signed {
   /// - parameter rhs: The second summand value (the addend).
   ///
   /// - returns: A constant value representing the sum of the two operands.
-  public static func +(lhs: Constant, rhs: Constant) -> Constant {
+  public static func + (lhs: Constant, rhs: Constant) -> Constant {
     return lhs.adding(rhs)
   }
 
@@ -500,7 +669,7 @@ extension Constant where Repr == Signed {
   /// - parameter rhs: The second value (the subtrahend).
   ///
   /// - returns: A constant value representing the difference of the two operands.
-  public static func -(lhs: Constant, rhs: Constant) -> Constant {
+  public static func - (lhs: Constant, rhs: Constant) -> Constant {
     return lhs.subtracting(rhs)
   }
 
@@ -510,7 +679,7 @@ extension Constant where Repr == Signed {
   /// - parameter rhs: The second factor value (the multiplicand).
   ///
   /// - returns: A constant value representing the product of the two operands.
-  public static func *(lhs: Constant, rhs: Constant) -> Constant {
+  public static func * (lhs: Constant, rhs: Constant) -> Constant {
     return lhs.multiplying(rhs)
   }
   
@@ -521,9 +690,10 @@ extension Constant where Repr == Signed {
   ///
   /// - returns: A constant value representing the value of the first operand
   ///   shifted left by the number of bits specified in the second operand.
-  public static func <<(lhs: Constant, rhs: Constant) -> Constant {
+  public static func << (lhs: Constant, rhs: Constant) -> Constant {
     return Constant.leftShift(lhs, rhs)
   }
+  
 }
 
 extension Constant where Repr == Unsigned {
@@ -534,7 +704,7 @@ extension Constant where Repr == Unsigned {
   /// - parameter rhs: The second summand value (the addend).
   ///
   /// - returns: A constant value representing the sum of the two operands.
-  public static func +(lhs: Constant, rhs: Constant) -> Constant {
+  public static func + (lhs: Constant, rhs: Constant) -> Constant {
     return lhs.adding(rhs)
   }
 
@@ -544,7 +714,7 @@ extension Constant where Repr == Unsigned {
   /// - parameter rhs: The second value (the subtrahend).
   ///
   /// - returns: A constant value representing the difference of the two operands.
-  public static func -(lhs: Constant, rhs: Constant) -> Constant {
+  public static func - (lhs: Constant, rhs: Constant) -> Constant {
     return lhs.subtracting(rhs)
   }
 
@@ -554,7 +724,7 @@ extension Constant where Repr == Unsigned {
   /// - parameter rhs: The second factor value (the multiplicand).
   ///
   /// - returns: A constant value representing the product of the two operands.
-  public static func *(lhs: Constant, rhs: Constant) -> Constant {
+  public static func * (lhs: Constant, rhs: Constant) -> Constant {
     return lhs.multiplying(rhs)
   }
 
@@ -565,9 +735,10 @@ extension Constant where Repr == Unsigned {
   ///
   /// - returns: A constant value representing the value of the first operand
   ///   shifted left by the number of bits specified in the second operand.
-  public static func <<(lhs: Constant, rhs: Constant) -> Constant {
+  public static func << (lhs: Constant, rhs: Constant) -> Constant {
     return Constant.leftShift(lhs, rhs)
   }
+  
 }
 
 extension Constant where Repr: IntegralConstantRepresentation {
@@ -578,9 +749,129 @@ extension Constant where Repr: IntegralConstantRepresentation {
   ///
   /// - returns: A constant value representing the logical negation of the given
   ///   operand.
-  public static prefix func !(_ lhs: Constant) -> Constant {
+  public static prefix func ! (_ lhs: Constant) -> Constant {
     return Constant(llvm: LLVMConstNot(lhs.llvm))
   }
+  
+}
+
+extension Constant where Repr == Signed {
+
+  /// A constant equality comparison between two values.
+  ///
+  /// - parameter lhs: The first value to compare.
+  /// - parameter rhs: The second value to compare.
+  ///
+  /// - returns: A constant integral value (i1) representing the result of the
+  ///   comparision of the given operands.
+  public static func == (lhs: Constant, rhs: Constant) -> Constant {
+    return Constant.equals(lhs, rhs)
+  }
+
+  /// A constant less-than comparison between two values.
+  ///
+  /// - parameter lhs: The first value to compare.
+  /// - parameter rhs: The second value to compare.
+  ///
+  /// - returns: A constant integral value (i1) representing the result of the
+  ///   comparision of the given operands.
+  public static func < (lhs: Constant, rhs: Constant) -> Constant {
+    return Constant.lessThan(lhs, rhs)
+  }
+
+  /// A constant greater-than comparison between two values.
+  ///
+  /// - parameter lhs: The first value to compare.
+  /// - parameter rhs: The second value to compare.
+  ///
+  /// - returns: A constant integral value (i1) representing the result of the
+  ///   comparision of the given operands.
+  public static func > (lhs: Constant, rhs: Constant) -> Constant {
+    return Constant.greaterThan(lhs, rhs)
+  }
+
+  /// A constant less-than-or-equal comparison between two values.
+  ///
+  /// - parameter lhs: The first value to compare.
+  /// - parameter rhs: The second value to compare.
+  ///
+  /// - returns: A constant integral value (i1) representing the result of the
+  ///   comparision of the given operands.
+  public static func <= (lhs: Constant, rhs: Constant) -> Constant {
+    return Constant.lessThanOrEqual(lhs, rhs)
+  }
+
+  /// A constant greater-than-or-equal comparison between two values.
+  ///
+  /// - parameter lhs: The first value to compare.
+  /// - parameter rhs: The second value to compare.
+  ///
+  /// - returns: A constant integral value (i1) representing the result of the
+  ///   comparision of the given operands.
+  public static func >= (lhs: Constant, rhs: Constant) -> Constant {
+    return Constant.greaterThanOrEqual(lhs, rhs)
+  }
+  
+}
+
+
+extension Constant where Repr == Unsigned {
+  
+  /// A constant equality comparison between two values.
+  ///
+  /// - parameter lhs: The first value to compare.
+  /// - parameter rhs: The second value to compare.
+  ///
+  /// - returns: A constant integral value (i1) representing the result of the
+  ///   comparision of the given operands.
+  public static func == (lhs: Constant, rhs: Constant) -> Constant<Signed> {
+    return Constant.equals(lhs, rhs)
+  }
+  
+  /// A constant less-than comparison between two values.
+  ///
+  /// - parameter lhs: The first value to compare.
+  /// - parameter rhs: The second value to compare.
+  ///
+  /// - returns: A constant integral value (i1) representing the result of the
+  ///   comparision of the given operands.
+  public static func < (lhs: Constant, rhs: Constant) -> Constant<Signed> {
+    return Constant.lessThan(lhs, rhs)
+  }
+  
+  /// A constant greater-than comparison between two values.
+  ///
+  /// - parameter lhs: The first value to compare.
+  /// - parameter rhs: The second value to compare.
+  ///
+  /// - returns: A constant integral value (i1) representing the result of the
+  ///   comparision of the given operands.
+  public static func > (lhs: Constant, rhs: Constant) -> Constant<Signed> {
+    return Constant.greaterThan(lhs, rhs)
+  }
+  
+  /// A constant less-than-or-equal comparison between two values.
+  ///
+  /// - parameter lhs: The first value to compare.
+  /// - parameter rhs: The second value to compare.
+  ///
+  /// - returns: A constant integral value (i1) representing the result of the
+  ///   comparision of the given operands.
+  public static func <= (lhs: Constant, rhs: Constant) -> Constant<Signed> {
+    return Constant.lessThanOrEqual(lhs, rhs)
+  }
+  
+  /// A constant greater-than-or-equal comparison between two values.
+  ///
+  /// - parameter lhs: The first value to compare.
+  /// - parameter rhs: The second value to compare.
+  ///
+  /// - returns: A constant integral value (i1) representing the result of the
+  ///   comparision of the given operands.
+  public static func >= (lhs: Constant, rhs: Constant) -> Constant<Signed> {
+    return Constant.greaterThanOrEqual(lhs, rhs)
+  }
+  
 }
 
 // MARK: Undef
