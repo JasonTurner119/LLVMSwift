@@ -418,4 +418,8 @@ public enum CallingConvention {
   public var llvm: LLVMCallConv {
     return CallingConvention.conventionMapping[self]!
   }
+  
+  @available(*, deprecated, message: "The WebKitJS calling convention is no longer supported by llvm.")
+  public static var webKitJS: Never { fatalError("The WebKitJS calling convention is no longer supported by llvm.") }
+  
 }
